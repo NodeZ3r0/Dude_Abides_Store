@@ -8,13 +8,13 @@ import logoImage from "@assets/Dude-sweater-design-shirt-6000x6000 (1)_176441740
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-white/10">
-      <div className="container mx-auto px-4 h-20 md:h-24 flex items-center justify-between">
+      <div className="container mx-auto px-2 md:px-4 h-20 md:h-24 flex items-center justify-between">
         
         {/* Mobile Menu & Search (Left on Mobile) */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1 md:hidden -ml-1">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -27,18 +27,18 @@ export function Header() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Button variant="ghost" size="icon" className="text-foreground hover:text-primary">
+          <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
             <Search className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Logo - Left on Desktop, Center on Mobile */}
         <div className="flex-1 md:flex-none flex justify-center md:justify-start">
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center group">
             <img 
               src={logoImage} 
               alt="The Dude Abides Logo" 
-              className="h-16 md:h-20 w-auto object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg" 
+              className="h-14 md:h-20 w-auto object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg" 
             />
           </Link>
         </div>
