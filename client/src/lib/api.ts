@@ -1,6 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@shared/schema";
-import { fetchProducts, fetchFeaturedProducts, type SaleorProduct } from "./saleor";
+import { 
+  fetchProducts, 
+  fetchFeaturedProducts, 
+  fetchCategories,
+  fetchCollections,
+  getChannel,
+  type SaleorProduct,
+  type SaleorCategory,
+  type SaleorCollection
+} from "./saleor";
 
 async function fetchAPI(endpoint: string, options?: RequestInit) {
   const res = await fetch(`/api${endpoint}`, {
@@ -117,18 +126,34 @@ export function useSeedProducts() {
   });
 }
 
-export function useSaleorProducts(channel: string = 'default-channel', first: number = 12) {
+export function useSaleorProducts(channel?: string, first: number = 12) {
+  const activeChannel = channel || getChannel();
   return useQuery({
-    queryKey: ["saleor-products", channel, first],
-    queryFn: () => fetchProducts(channel, first),
+    queryKey: ["saleor-products", activeChannel, first],
+    queryFn: () => fetchProducts(activeChannel, first),
   });
 }
 
-export function useSaleorFeaturedProducts(channel: string = 'default-channel') {
+export function useSaleorFeaturedProducts(channel?: string, collectionSlug: string = 'featured') {
+  const activeChannel = channel || getChannel();
   return useQuery({
-    queryKey: ["saleor-featured-products", channel],
-    queryFn: () => fetchFeaturedProducts(channel),
+    queryKey: ["saleor-featured-products", activeChannel, collectionSlug],
+    queryFn: () => fetchFeaturedProducts(activeChannel, collectionSlug),
   });
 }
 
-export type { SaleorProduct };
+export function useSaleorCategories(first: number = 20) {
+  return useQuery({
+    queryKey: ["saleor-categories", first],
+    queryFn: () => fetchCategories(first),
+  });
+}
+
+export function useSaleorCollections(first: number = 10) {
+  return useQuery({
+    queryKey: ["saleor-collections", first],
+    queryFn: () => fetchCollections(first),
+  });
+}
+
+export type { SaleorProduct, SaleorCategory, SaleorCollection };

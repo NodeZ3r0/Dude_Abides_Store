@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Truck, Percent } from "lucide-react";
-import { useProducts, useSeedProducts, useSaleorProducts, type SaleorProduct } from "@/lib/api";
+import { useProducts, useSeedProducts, useSaleorProducts, useSaleorCategories, useSaleorCollections, type SaleorProduct, type SaleorCategory, type SaleorCollection } from "@/lib/api";
 import dudeRug from "@assets/3122730_main_1764430531420.jpg";
 
 // Mock Data for Blogs
@@ -32,7 +32,9 @@ const blogs = [
 
 export default function Home() {
   const { data: products, isLoading, error } = useProducts();
-  const { data: saleorProducts, isLoading: saleorLoading, error: saleorError } = useSaleorProducts('default-channel', 8);
+  const { data: saleorProducts, isLoading: saleorLoading, error: saleorError } = useSaleorProducts(undefined, 8);
+  const { data: saleorCategories, isLoading: categoriesLoading } = useSaleorCategories(10);
+  const { data: saleorCollections, isLoading: collectionsLoading } = useSaleorCollections(10);
   const seedMutation = useSeedProducts();
 
   const handleSeedData = () => {
@@ -267,26 +269,50 @@ export default function Home() {
          </div>
       </section>
 
-      {/* Collections List */}
+      {/* Collections List - From Saleor or Fallback */}
       <section className="py-20 bg-background">
          <div className="container mx-auto px-4">
             <h2 className="font-display text-2xl md:text-3xl text-center text-[#e8dac9] mb-12 tracking-wide">
-               The Dude's Collections
+               {saleorCollections && saleorCollections.length > 0 ? "Shop Collections" : "The Dude's Collections"}
             </h2>
+            
+            {collectionsLoading && (
+              <div className="text-center py-8">
+                <p className="text-white/50">Loading collections...</p>
+              </div>
+            )}
+            
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               {[
-                  { title: "Clothing for Men", img: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=400&auto=format&fit=crop" },
+               {saleorCollections && saleorCollections.length > 0 ? (
+                 saleorCollections.slice(0, 4).map((collection: SaleorCollection) => (
+                   <div key={collection.id} className="group cursor-pointer text-center" data-testid={`collection-${collection.slug}`}>
+                     <div className="aspect-square bg-white overflow-hidden rounded-sm mb-4 flex items-center justify-center p-4">
+                       {collection.backgroundImage?.url ? (
+                         <img src={collection.backgroundImage.url} alt={collection.backgroundImage.alt || collection.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"/>
+                       ) : (
+                         <div className="w-full h-full bg-[#3a2c26] flex items-center justify-center">
+                           <span className="text-[#e8dac9] text-sm">{collection.name}</span>
+                         </div>
+                       )}
+                     </div>
+                     <h3 className="font-display text-[#e8dac9] text-sm leading-tight group-hover:text-primary">{collection.name}</h3>
+                   </div>
+                 ))
+               ) : !collectionsLoading && (
+                 [{
+                    title: "Clothing for Men", img: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=400&auto=format&fit=crop" },
                   { title: "Clothing for Women", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=400&auto=format&fit=crop" },
                   { title: "Clothing For Kids", img: "https://images.unsplash.com/photo-1519457431-44ccd64a579b?q=80&w=400&auto=format&fit=crop" },
                   { title: "Coffee Mugs and Water Bottles", img: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=400&auto=format&fit=crop" }
-               ].map((col, idx) => (
-                  <div key={idx} className="group cursor-pointer text-center">
-                     <div className="aspect-square bg-white overflow-hidden rounded-sm mb-4 flex items-center justify-center p-4">
-                        <img src={col.img} alt={col.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"/>
-                     </div>
-                     <h3 className="font-display text-[#e8dac9] text-sm leading-tight group-hover:text-primary">{col.title}</h3>
-                  </div>
-               ))}
+                 ].map((col, idx) => (
+                   <div key={idx} className="group cursor-pointer text-center">
+                      <div className="aspect-square bg-white overflow-hidden rounded-sm mb-4 flex items-center justify-center p-4">
+                         <img src={col.img} alt={col.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"/>
+                      </div>
+                      <h3 className="font-display text-[#e8dac9] text-sm leading-tight group-hover:text-primary">{col.title}</h3>
+                   </div>
+                 ))
+               )}
             </div>
             <div className="text-center mt-12">
               <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-2 text-xs font-bold uppercase tracking-widest rounded-sm">
