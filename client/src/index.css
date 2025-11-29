@@ -24,10 +24,6 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
   
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -40,78 +36,70 @@
 }
 
 :root {
-  /* The Dude Abides Theme */
-  /* Cream Background */
-  --background: 36 33% 90%; 
-  --foreground: 20 25% 20%; /* Rich Dark Brown */
+  /* THE DUDE ABIDES - DARK THEME (Default based on screenshots) */
+  
+  /* Deep Rich Brown Background (almost black/maroon) */
+  --background: 0 30% 15%; 
+  
+  /* Cream/Beige Text */
+  --foreground: 36 33% 90%; 
 
-  /* Card - Cream */
-  --card: 36 33% 94%;
-  --card-foreground: 20 25% 20%;
+  /* Card - Slightly lighter brown or same as BG */
+  --card: 0 30% 18%;
+  --card-foreground: 36 33% 90%;
 
-  --popover: 36 33% 94%;
-  --popover-foreground: 20 25% 20%;
+  --popover: 0 30% 15%;
+  --popover-foreground: 36 33% 90%;
 
   /* Orange Accent */
   --primary: 14 89% 53%;
-  --primary-foreground: 36 33% 90%; /* Cream text on Orange */
+  --primary-foreground: 0 30% 15%; /* Dark text on Orange */
 
-  /* Dark Brown (Secondary/Header) */
-  --secondary: 20 25% 20%;
-  --secondary-foreground: 36 33% 90%; /* Cream text on Brown */
+  /* Lighter Brown for secondary elements */
+  --secondary: 36 33% 90%; /* Cream as secondary background */
+  --secondary-foreground: 0 30% 15%; /* Dark brown text on cream */
 
-  /* Muted/Subtle */
-  --muted: 36 20% 85%;
-  --muted-foreground: 20 20% 40%;
+  /* Muted */
+  --muted: 0 20% 25%;
+  --muted-foreground: 36 20% 70%;
 
-  --accent: 36 33% 85%;
-  --accent-foreground: 20 25% 20%;
-
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 20 25% 20%; /* Brown borders */
-  --input: 20 25% 20%;
-  --ring: 14 89% 53%;
-  
-  --radius: 0.5rem;
-
-  --chart-1: 14 89% 53%;
-  --chart-2: 15 25% 20%;
-  --chart-3: 36 33% 80%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
-}
-
-.dark {
-  /* Inverted/Dark Mode - Maybe darker brown/coffee tones */
-  --background: 20 14% 10%;
-  --foreground: 36 33% 90%;
-
-  --card: 20 14% 14%;
-  --card-foreground: 36 33% 90%;
-
-  --popover: 20 14% 14%;
-  --popover-foreground: 36 33% 90%;
-
-  --primary: 14 89% 53%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 15 25% 25%;
-  --secondary-foreground: 36 33% 90%;
-
-  --muted: 20 14% 20%;
-  --muted-foreground: 36 20% 60%;
-
-  --accent: 20 14% 20%;
+  --accent: 0 25% 25%;
   --accent-foreground: 36 33% 90%;
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 20 14% 20%;
-  --input: 20 14% 20%;
+  --border: 36 20% 25%; /* Subtle cream border */
+  --input: 0 20% 25%;
   --ring: 14 89% 53%;
+  
+  --radius: 0px; /* Sharper corners like screenshots */
+  
+  --chart-1: 14 89% 53%;
+}
+
+/* Utility class for the sweater pattern overlay */
+.bg-pattern-overlay {
+  position: relative;
+}
+.bg-pattern-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('@assets/dude_sweater_pattern-lg_1764417434368.png');
+  background-size: 300px;
+  background-repeat: repeat;
+  opacity: 0.15; /* Subtle texture */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Modal/Popup specific pattern */
+.modal-pattern {
+  background-image: url('@assets/dude_sweater_pattern-lg_1764417434368.png');
+  background-size: 300px;
+  background-repeat: repeat;
+  opacity: 0.25;
 }
 
 @layer base {
@@ -122,6 +110,6 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-secondary;
+    @apply font-display uppercase tracking-wide;
   }
 }

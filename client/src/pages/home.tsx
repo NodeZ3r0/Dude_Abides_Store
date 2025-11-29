@@ -2,95 +2,214 @@ import { Layout } from "@/components/layout";
 import { mockProducts } from "@/lib/mockData";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
-import rugPattern from "@assets/generated_images/a_cozy_rug_texture_pattern_inspired_by_the_big_lebowski.png";
+import { Truck, Percent, Hand } from "lucide-react";
+
+// Mock Data for Blogs
+const blogs = [
+  {
+    id: 1,
+    title: "The Real American Value Menu",
+    date: "July 20, 2025",
+    excerpt: "Cut the military budget in half - still the biggest in the world.",
+    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 2,
+    title: "Wired for Democracy",
+    date: "July 19, 2025",
+    excerpt: "As liberal democratic nations come under increasing pressure...",
+    image: "https://images.unsplash.com/photo-1540910419868-474947ce5716?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 3,
+    title: "The Blitzgrift: When Governance Turns into Chaos",
+    date: "March 12, 2025",
+    excerpt: "Donald Trump in the eye of Hurricane DOGE, celebrating the destruction...",
+    image: "https://images.unsplash.com/photo-1601933470096-0e34634ffcde?q=80&w=600&auto=format&fit=crop"
+  }
+];
 
 export default function Home() {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={rugPattern} 
-            alt="Rug Pattern" 
-            className="w-full h-full object-cover opacity-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <div className="absolute inset-0 bg-secondary/20 mix-blend-multiply" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="inline-block mb-6 animate-in fade-in zoom-in duration-1000">
-            <span className="px-4 py-2 bg-primary text-white text-sm font-bold uppercase tracking-widest rounded-full shadow-lg">
-              New Collection Drop
-            </span>
-          </div>
-          <h1 className="font-display text-6xl md:text-8xl text-secondary drop-shadow-2xl mb-6 animate-in slide-in-from-bottom-4 duration-1000 delay-200">
+      {/* Hero Text Section */}
+      <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="font-display text-6xl md:text-8xl lg:text-9xl text-[#e8dac9] mb-6 animate-in slide-in-from-bottom-4 duration-700">
             THE DUDE<br/>ABIDES
           </h1>
-          <p className="text-xl md:text-2xl text-foreground/90 font-medium max-w-2xl mx-auto mb-10 drop-shadow-md animate-in slide-in-from-bottom-4 duration-1000 delay-300">
-            The finest apparel and accessories for those who take it easy. 
-            It really ties the room together.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in slide-in-from-bottom-4 duration-1000 delay-500">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white text-lg px-8 py-6 font-header tracking-wide shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all">
-              SHOP NOW
-            </Button>
-            <Button size="lg" variant="outline" className="bg-white/80 hover:bg-white text-secondary border-2 border-secondary text-lg px-8 py-6 font-header tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-              VIEW CATALOG
-            </Button>
-          </div>
+          <h2 className="font-display text-2xl md:text-4xl text-[#e8dac9] mb-12 max-w-3xl mx-auto animate-in slide-in-from-bottom-4 duration-700 delay-200">
+            Merch for Those Who Give A Damn
+          </h2>
+          
+          <h3 className="font-display text-xl md:text-2xl text-[#e8dac9] opacity-90 animate-in slide-in-from-bottom-4 duration-700 delay-300">
+            Featured Products
+          </h3>
         </div>
       </section>
-
-      {/* Featured Products */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <h2 className="font-display text-4xl text-secondary mb-2">Featured Merch</h2>
-              <p className="text-muted-foreground">Hand-picked items for the urban achiever.</p>
+      
+      {/* Featured Product Highlight - Single Item (Like Hoodie in screenshot) */}
+      <section className="pb-16 bg-background">
+         <div className="container mx-auto px-4">
+            <div className="max-w-md mx-auto group cursor-pointer">
+               <div className="aspect-[4/5] overflow-hidden rounded-sm bg-white/5 relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=800&auto=format&fit=crop" 
+                    alt="Snapback Hat" 
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-[#3d2b25] p-4 text-center">
+                     <h3 className="font-display text-[#e8dac9] text-xl">Snapback Hat</h3>
+                  </div>
+               </div>
             </div>
-            <Button variant="link" className="text-primary font-bold hidden md:block">
-              View All Products &rarr;
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-          
-          <div className="mt-12 text-center md:hidden">
-            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
-              View All Products
-            </Button>
-          </div>
+         </div>
+      </section>
+
+      {/* Features Icons Bar */}
+      <section className="py-12 bg-[#e8dac9] text-[#2a201c]">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+           <div className="flex flex-col items-center gap-4">
+              <Truck className="h-10 w-10 stroke-1" />
+              <div>
+                 <h4 className="font-display text-lg font-bold mb-1">Free Shipping</h4>
+                 <p className="text-sm opacity-80">All of our products offer Free Shipping!</p>
+              </div>
+           </div>
+           <div className="flex flex-col items-center gap-4">
+              <Percent className="h-10 w-10 stroke-1" />
+              <div>
+                 <h4 className="font-display text-lg font-bold mb-1">The Dude's Discount</h4>
+                 <p className="text-sm opacity-80">Buy 3 or more products and get 15% off!</p>
+              </div>
+           </div>
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-24 bg-secondary text-secondary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-5xl mb-6">Don't Miss Out, Man</h2>
-          <p className="text-xl text-secondary-foreground/80 mb-10 max-w-xl mx-auto">
-            Subscribe to our newsletter for occasional updates, new product drops, and bowling league schedules.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              className="flex-1 px-6 py-4 rounded-md bg-secondary-foreground/10 border border-secondary-foreground/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white font-bold px-8">
-              SUBSCRIBE
-            </Button>
-          </div>
+      {/* Pride Collection Grid */}
+      <section className="py-20 bg-background text-[#e8dac9]">
+        <div className="container mx-auto px-4">
+           <h2 className="font-display text-2xl md:text-3xl text-center mb-12 tracking-wide">
+              Pride Lives Here LGBTQIA+ Collection
+           </h2>
+           
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+              {mockProducts.slice(0,4).map((product) => (
+                 <div key={product.id} className="group">
+                    <div className="aspect-square bg-white/5 overflow-hidden rounded-sm mb-4 relative">
+                       {/* Checkbox style selector from screenshot */}
+                       <div className="absolute top-2 left-2 z-10 flex items-center gap-1">
+                          <div className="h-4 w-4 border border-white/30 rounded-sm"></div>
+                          <span className="text-[10px] uppercase tracking-wider text-white/70">Compare</span>
+                       </div>
+                       <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                       <div className="absolute bottom-0 left-0 w-full p-2 bg-background/80 backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity text-center">
+                          <Button size="sm" className="w-full bg-[#e8dac9] text-background hover:bg-white text-xs uppercase font-bold">Quick Shop</Button>
+                       </div>
+                    </div>
+                    <div className="space-y-1">
+                       <div className="flex gap-1 justify-center mb-2">
+                          {/* Color swatches */}
+                          <div className="h-3 w-3 rounded-full bg-black border border-white/20"></div>
+                          <div className="h-3 w-3 rounded-full bg-blue-900 border border-white/20"></div>
+                          <div className="h-3 w-3 rounded-full bg-gray-500 border border-white/20"></div>
+                          <span className="text-[10px] text-white/50 ml-1">+17</span>
+                       </div>
+                       <p className="font-bold text-[#e8dac9]">${product.price.toFixed(2)}</p>
+                       <h3 className="text-sm text-white/80 font-medium leading-tight hover:text-primary cursor-pointer">{product.name}</h3>
+                       <p className="text-xs text-[#c45d36]">The Dude Abides®</p>
+                       <p className="text-[10px] text-green-500 uppercase tracking-wide">In stock</p>
+                    </div>
+                 </div>
+              ))}
+           </div>
+           
+           <div className="text-center mt-12">
+              <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-6 text-sm font-bold uppercase tracking-widest rounded-sm">
+                 Buy Now!
+              </Button>
+           </div>
         </div>
+      </section>
+
+      {/* Hero Banner - Beach Life */}
+      <section className="py-12 bg-[#2a1a15] border-y border-white/5">
+         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1 flex justify-center">
+               <div className="relative max-w-xs">
+                  <img src="https://images.unsplash.com/photo-1545959796-9659fa30a30b?q=80&w=600&auto=format&fit=crop" alt="Tank Top" className="rounded-sm shadow-2xl"/>
+                  {/* Thumbnails sidebar simulation */}
+                  <div className="absolute -left-16 top-0 bottom-0 w-12 flex flex-col gap-2 overflow-hidden">
+                     {[1,2,3,4].map(i => (
+                        <div key={i} className="w-full aspect-[3/4] bg-white/10 border border-white/20"></div>
+                     ))}
+                  </div>
+               </div>
+            </div>
+            <div className="order-1 md:order-2 text-center md:text-left">
+               <h2 className="font-display text-4xl md:text-5xl text-[#e8dac9] mb-4">Beach Life Is<br/>The Best Life</h2>
+               <p className="text-xl text-[#e8dac9] font-bold mb-6">$25.99</p>
+               <Button variant="link" className="text-[#c45d36] hover:text-white p-0 text-sm font-bold uppercase tracking-wider decoration-2 underline-offset-4">
+                  View full details
+               </Button>
+            </div>
+         </div>
+      </section>
+
+      {/* Collections List */}
+      <section className="py-20 bg-background">
+         <div className="container mx-auto px-4">
+            <h2 className="font-display text-2xl md:text-3xl text-center text-[#e8dac9] mb-12 tracking-wide">
+               The Dude's Collections
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               {[
+                  { title: "Clothing for Men", img: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=400&auto=format&fit=crop" },
+                  { title: "Clothing for Women", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=400&auto=format&fit=crop" },
+                  { title: "Clothing For Kids", img: "https://images.unsplash.com/photo-1519457431-44ccd64a579b?q=80&w=400&auto=format&fit=crop" },
+                  { title: "Coffee Mugs and Water Bottles", img: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=400&auto=format&fit=crop" }
+               ].map((col, idx) => (
+                  <div key={idx} className="group cursor-pointer text-center">
+                     <div className="aspect-square bg-white overflow-hidden rounded-sm mb-4 flex items-center justify-center p-4">
+                        <img src={col.img} alt={col.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"/>
+                     </div>
+                     <h3 className="font-display text-[#e8dac9] text-sm leading-tight group-hover:text-primary">{col.title}</h3>
+                  </div>
+               ))}
+            </div>
+            <div className="text-center mt-12">
+              <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-2 text-xs font-bold uppercase tracking-widest rounded-sm">
+                 View All
+              </Button>
+           </div>
+         </div>
+      </section>
+
+      {/* Blog Posts */}
+      <section className="py-20 bg-[#1a120f] border-t border-white/5">
+         <div className="container mx-auto px-4">
+            <h2 className="font-display text-2xl md:text-3xl text-center text-[#e8dac9] mb-12 tracking-wide">
+               Blog posts
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               {blogs.map((blog) => (
+                  <div key={blog.id} className="group cursor-pointer bg-[#2a201c] hover:bg-[#3a2c26] transition-colors rounded-sm overflow-hidden h-full flex flex-col">
+                     <div className="aspect-video overflow-hidden">
+                        <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                     </div>
+                     <div className="p-6 flex-1 flex flex-col text-center">
+                        <p className="text-xs text-white/40 mb-2 uppercase tracking-wider">{blog.date}</p>
+                        <h3 className="font-display text-[#e8dac9] text-xl mb-4 leading-tight group-hover:text-primary">{blog.title}</h3>
+                        <p className="text-sm text-white/60 mb-6 flex-1 line-clamp-3">{blog.excerpt}</p>
+                        <span className="text-xs text-[#c45d36] font-bold uppercase tracking-widest group-hover:text-white transition-colors">Read now &gt;</span>
+                     </div>
+                  </div>
+               ))}
+            </div>
+            <div className="text-center mt-12">
+               <span className="text-xs text-[#c45d36] font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-colors">See more &gt;</span>
+            </div>
+         </div>
       </section>
     </Layout>
   );
