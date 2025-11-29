@@ -8,10 +8,10 @@ import logoImage from "@assets/Dude-sweater-design-shirt-6000x6000 (1)_176441740
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-white/10">
-      <div className="container mx-auto px-2 md:px-4 h-20 md:h-24 flex items-center justify-between">
+      <div className="w-full px-0 md:container md:mx-auto md:px-4 h-20 md:h-24 flex items-center justify-between">
         
         {/* Mobile Menu & Search (Left on Mobile) */}
-        <div className="flex items-center gap-1 md:hidden -ml-1">
+        <div className="flex items-center gap-0 md:hidden pl-1">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
