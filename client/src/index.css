@@ -89,7 +89,7 @@
   background-image: url('@assets/dude_sweater_pattern-lg_1764417434368.png');
   background-size: 300px;
   background-repeat: repeat;
-  opacity: 0.15; /* Subtle texture */
+  opacity: 0.25; /* Updated to 25% as requested */
   pointer-events: none;
   z-index: 0;
 }

@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout";
 import { mockProducts } from "@/lib/mockData";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
-import { Truck, Percent, Hand } from "lucide-react";
+import { Truck, Percent } from "lucide-react";
 
 // Mock Data for Blogs
 const blogs = [
@@ -66,9 +66,9 @@ export default function Home() {
          </div>
       </section>
 
-      {/* Features Icons Bar */}
-      <section className="py-12 bg-[#e8dac9] text-[#2a201c]">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+      {/* Features Icons Bar - Cream Background with Pattern */}
+      <section className="py-12 bg-[#e8dac9] text-[#2a201c] bg-pattern-overlay">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 text-center relative z-10">
            <div className="flex flex-col items-center gap-4">
               <Truck className="h-10 w-10 stroke-1" />
               <div>
@@ -118,7 +118,7 @@ export default function Home() {
                        <p className="font-bold text-[#e8dac9]">${product.price.toFixed(2)}</p>
                        <h3 className="text-sm text-white/80 font-medium leading-tight hover:text-primary cursor-pointer">{product.name}</h3>
                        <p className="text-xs text-[#c45d36]">The Dude Abides®</p>
-                       <p className="text-[10px] text-green-500 uppercase tracking-wide">In stock</p>
+                       <p className="text-xs text-green-500 uppercase tracking-wide">In stock</p>
                     </div>
                  </div>
               ))}
