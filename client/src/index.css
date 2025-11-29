@@ -35,43 +35,43 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: 'Inter', sans-serif;
-  --font-display: 'Rye', serif;
+  --font-display: 'Oswald', sans-serif;
   --font-header: 'Oswald', sans-serif;
 }
 
 :root {
   /* The Dude Abides Theme */
-  /* Beige/Tan Background */
+  /* Cream Background */
   --background: 36 33% 90%; 
-  --foreground: 20 14% 15%; /* Dark Brown Text */
+  --foreground: 20 25% 20%; /* Rich Dark Brown */
 
-  /* Card - slightly lighter tan */
+  /* Card - Cream */
   --card: 36 33% 94%;
-  --card-foreground: 20 14% 15%;
+  --card-foreground: 20 25% 20%;
 
   --popover: 36 33% 94%;
-  --popover-foreground: 20 14% 15%;
+  --popover-foreground: 20 25% 20%;
 
   /* Orange Accent */
   --primary: 14 89% 53%;
-  --primary-foreground: 0 0% 100%;
+  --primary-foreground: 36 33% 90%; /* Cream text on Orange */
 
   /* Dark Brown (Secondary/Header) */
-  --secondary: 15 25% 20%;
-  --secondary-foreground: 36 33% 90%;
+  --secondary: 20 25% 20%;
+  --secondary-foreground: 36 33% 90%; /* Cream text on Brown */
 
   /* Muted/Subtle */
   --muted: 36 20% 85%;
-  --muted-foreground: 20 10% 40%;
+  --muted-foreground: 20 20% 40%;
 
   --accent: 36 33% 85%;
-  --accent-foreground: 20 14% 15%;
+  --accent-foreground: 20 25% 20%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 20 10% 80%;
-  --input: 20 10% 80%;
+  --border: 20 25% 20%; /* Brown borders */
+  --input: 20 25% 20%;
   --ring: 14 89% 53%;
   
   --radius: 0.5rem;
