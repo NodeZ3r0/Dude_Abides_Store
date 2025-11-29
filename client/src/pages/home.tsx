@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Truck, Percent } from "lucide-react";
 import { useProducts, useSeedProducts, useSaleorProducts, type SaleorProduct } from "@/lib/api";
-import dudeRug from "@assets/3122730_main_1764420889096.jpg";
+import dudeRug from "@assets/3122730_main_1764430531420.jpg";
 
 // Mock Data for Blogs
 const blogs = [

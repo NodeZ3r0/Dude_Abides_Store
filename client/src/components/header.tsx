@@ -3,7 +3,7 @@ import { ShoppingBag, User, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import logoImage from "@assets/Dude-sweater-design-shirt-6000x6000 (1)_1764417402275.png";
+import logoImage from "@assets/logo-400_1764430531407.png";
 
 export function Header() {
   return (
