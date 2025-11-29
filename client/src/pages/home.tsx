@@ -1,8 +1,8 @@
 import { Layout } from "@/components/layout";
-import { mockProducts } from "@/lib/mockData";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Truck, Percent } from "lucide-react";
+import { useProducts, useSeedProducts } from "@/lib/api";
 
 // Mock Data for Blogs
 const blogs = [
@@ -30,6 +30,13 @@ const blogs = [
 ];
 
 export default function Home() {
+  const { data: products, isLoading, error } = useProducts();
+  const seedMutation = useSeedProducts();
+
+  const handleSeedData = () => {
+    seedMutation.mutate();
+  };
+
   return (
     <Layout>
       {/* Hero Text Section */}
@@ -93,42 +100,66 @@ export default function Home() {
               Pride Lives Here LGBTQIA+ Collection
            </h2>
            
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-              {mockProducts.slice(0,4).map((product) => (
-                 <div key={product.id} className="group">
-                    <div className="aspect-square bg-white/5 overflow-hidden rounded-sm mb-4 relative">
-                       {/* Checkbox style selector from screenshot */}
-                       <div className="absolute top-2 left-2 z-10 flex items-center gap-1">
-                          <div className="h-4 w-4 border border-white/30 rounded-sm"></div>
-                          <span className="text-[10px] uppercase tracking-wider text-white/70">Compare</span>
-                       </div>
-                       <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-                       <div className="absolute bottom-0 left-0 w-full p-2 bg-background/80 backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity text-center">
-                          <Button size="sm" className="w-full bg-[#e8dac9] text-background hover:bg-white text-xs uppercase font-bold">Quick Shop</Button>
-                       </div>
-                    </div>
-                    <div className="space-y-1">
-                       <div className="flex gap-1 justify-center mb-2">
-                          {/* Color swatches */}
-                          <div className="h-3 w-3 rounded-full bg-black border border-white/20"></div>
-                          <div className="h-3 w-3 rounded-full bg-blue-900 border border-white/20"></div>
-                          <div className="h-3 w-3 rounded-full bg-gray-500 border border-white/20"></div>
-                          <span className="text-[10px] text-white/50 ml-1">+17</span>
-                       </div>
-                       <p className="font-bold text-[#e8dac9]">${product.price.toFixed(2)}</p>
-                       <h3 className="text-sm text-white/80 font-medium leading-tight hover:text-primary cursor-pointer">{product.name}</h3>
-                       <p className="text-xs text-[#c45d36]">The Dude Abides®</p>
-                       <p className="text-xs text-green-500 uppercase tracking-wide">In stock</p>
-                    </div>
-                 </div>
-              ))}
-           </div>
+           {isLoading && (
+             <div className="text-center py-12">
+               <p className="text-[#e8dac9]">Loading products...</p>
+             </div>
+           )}
            
-           <div className="text-center mt-12">
-              <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-6 text-sm font-bold uppercase tracking-widest rounded-sm">
-                 Buy Now!
-              </Button>
-           </div>
+           {error && (
+             <div className="text-center py-12">
+               <p className="text-[#c45d36] mb-4">No products found. Would you like to add some?</p>
+               <Button 
+                 onClick={handleSeedData}
+                 disabled={seedMutation.isPending}
+                 className="bg-[#e8dac9] text-[#2a201c] hover:bg-white"
+                 data-testid="button-seed-products"
+               >
+                 {seedMutation.isPending ? "Adding Products..." : "Add Sample Products"}
+               </Button>
+             </div>
+           )}
+           
+           {products && products.length > 0 && (
+             <>
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                {products.slice(0,4).map((product) => (
+                   <div key={product.id} className="group">
+                      <div className="aspect-square bg-white/5 overflow-hidden rounded-sm mb-4 relative">
+                         {/* Checkbox style selector from screenshot */}
+                         <div className="absolute top-2 left-2 z-10 flex items-center gap-1">
+                            <div className="h-4 w-4 border border-white/30 rounded-sm"></div>
+                            <span className="text-[10px] uppercase tracking-wider text-white/70">Compare</span>
+                         </div>
+                         <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                         <div className="absolute bottom-0 left-0 w-full p-2 bg-background/80 backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity text-center">
+                            <Button size="sm" className="w-full bg-[#e8dac9] text-background hover:bg-white text-xs uppercase font-bold">Quick Shop</Button>
+                         </div>
+                      </div>
+                      <div className="space-y-1">
+                         <div className="flex gap-1 justify-center mb-2">
+                            {/* Color swatches */}
+                            <div className="h-3 w-3 rounded-full bg-black border border-white/20"></div>
+                            <div className="h-3 w-3 rounded-full bg-blue-900 border border-white/20"></div>
+                            <div className="h-3 w-3 rounded-full bg-gray-500 border border-white/20"></div>
+                            <span className="text-[10px] text-white/50 ml-1">+17</span>
+                         </div>
+                         <p className="font-bold text-[#e8dac9]" data-testid={`text-price-${product.id}`}>${parseFloat(product.price).toFixed(2)}</p>
+                         <h3 className="text-sm text-white/80 font-medium leading-tight hover:text-primary cursor-pointer" data-testid={`text-name-${product.id}`}>{product.name}</h3>
+                         <p className="text-xs text-[#c45d36]">The Dude Abides®</p>
+                         <p className="text-xs text-green-500 uppercase tracking-wide">In stock</p>
+                      </div>
+                   </div>
+                ))}
+               </div>
+               
+               <div className="text-center mt-12">
+                  <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-6 text-sm font-bold uppercase tracking-widest rounded-sm">
+                     Buy Now!
+                  </Button>
+               </div>
+             </>
+           )}
         </div>
       </section>
 
