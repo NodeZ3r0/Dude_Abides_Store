@@ -40,8 +40,15 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Hero Text Section */}
+      {/* Hero Text Section with Rug Background */}
       <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
+        {/* The Dude's Rug Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-25"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1600166898405-da9535204843?q=80&w=1600&auto=format&fit=crop')`,
+          }}
+        />
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="font-display text-6xl md:text-8xl lg:text-9xl text-[#e8dac9] mb-6 animate-in slide-in-from-bottom-4 duration-700">
             THE DUDE<br/>ABIDES
