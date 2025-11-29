@@ -11,7 +11,7 @@ export function Header() {
       <div className="w-full px-0 md:container md:mx-auto md:px-4 h-20 md:h-24 flex items-center justify-between">
         
         {/* Mobile Menu & Search (Left on Mobile) */}
-        <div className="flex items-center gap-0 md:hidden pl-1">
+        <div className="flex items-center gap-0 md:hidden">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
