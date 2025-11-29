@@ -133,27 +133,17 @@ export interface SaleorProduct {
 }
 
 export async function fetchProducts(channel: string = 'default-channel', first: number = 12): Promise<SaleorProduct[]> {
-  try {
-    const data = await saleorClient.request<{ products: { edges: { node: SaleorProduct }[] } }>(
-      PRODUCT_LIST_QUERY,
-      { channel, first }
-    );
-    return data.products.edges.map(edge => edge.node);
-  } catch (error) {
-    console.error('Failed to fetch products from Saleor:', error);
-    return [];
-  }
+  const data = await saleorClient.request<{ products: { edges: { node: SaleorProduct }[] } }>(
+    PRODUCT_LIST_QUERY,
+    { channel, first }
+  );
+  return data.products.edges.map(edge => edge.node);
 }
 
 export async function fetchFeaturedProducts(channel: string = 'default-channel'): Promise<SaleorProduct[]> {
-  try {
-    const data = await saleorClient.request<{ collection: { products: { edges: { node: SaleorProduct }[] } } }>(
-      FEATURED_PRODUCTS_QUERY,
-      { channel, slug: 'featured-products' }
-    );
-    return data.collection?.products?.edges?.map(edge => edge.node) || [];
-  } catch (error) {
-    console.error('Failed to fetch featured products from Saleor:', error);
-    return [];
-  }
+  const data = await saleorClient.request<{ collection: { products: { edges: { node: SaleorProduct }[] } } }>(
+    FEATURED_PRODUCTS_QUERY,
+    { channel, slug: 'featured-products' }
+  );
+  return data.collection?.products?.edges?.map(edge => edge.node) || [];
 }
