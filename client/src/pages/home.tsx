@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { Truck, Percent } from "lucide-react";
 import { useProducts, useSeedProducts, useSaleorProducts, type SaleorProduct } from "@/lib/api";
+import rugImage from "@assets/stock_images/red_persian_oriental_2c132cbd.jpg";
 
 // Mock Data for Blogs
 const blogs = [
@@ -42,11 +43,11 @@ export default function Home() {
     <Layout>
       {/* Hero Text Section with Rug Background */}
       <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
-        {/* The Dude's Rug Background - Big Lebowski style */}
+        {/* The Dude's Rug Background - Big Lebowski style red Persian rug */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-25"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1531835551805-16d864c8d311?q=80&w=1600&auto=format&fit=crop')`,
+            backgroundImage: `url(${rugImage})`,
           }}
         />
         <div className="container mx-auto px-4 relative z-10">
