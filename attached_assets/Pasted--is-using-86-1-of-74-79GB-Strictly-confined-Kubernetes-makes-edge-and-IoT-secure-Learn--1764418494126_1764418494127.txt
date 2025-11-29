@@ -1,0 +1,867 @@
+
+  => / is using 86.1% of 74.79GB
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+16 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+36 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+*** System restart required ***
+You have mail.
+Last login: Fri Nov 28 11:46:07 2025 from 174.253.87.85
+root@WOPR:~# cd /opt/thedudeabides-store/storefront
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# find src -type f -mmin -1440 -printf "%TY-%Tm-%Td %TH:%TM %p\n" | sort
+2025-11-27 17:27 src/app/[channel]/(main)/products/[slug]/page.tsximport edjsHTML from "editorjs-html";}
+2025-11-27 17:50 src/app/[channel]/(main)/products/[slug]/page.tsx
+2025-11-28 05:05 src/gql/gql.ts
+2025-11-28 05:05 src/gql/graphql.ts
+2025-11-28 05:05 src/gql/index.ts
+2025-11-28 05:10 src/app/checkout/page.tsx
+2025-11-28 06:30 src/ui/components/Header.tsx
+2025-11-28 06:35 src/app/globals.css
+2025-11-28 07:56 src/ui/components/Footer.tsx
+2025-11-28 09:47 src/app/dude-custom.css
+2025-11-28 11:48 src/ui/components/Logo.tsx
+2025-11-28 11:54 src/app/[channel]/(main)/page.tsx
+2025-11-28 12:30 src/app/layout.tsx
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# cd /opt/thedudeabides-store/storefront
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# tee src/app/layout.tsx > /dev/null << 'EOF'
+> import "./globals.css";
+> import "./dude-custom.css";
+> import type { Metadata } from "next";
+> import type { ReactNode } from "react";
+>
+> export const metadata: Metadata = {
+>   metadataBase: new URL("https://dudeabides.wopr.systems"),
+>   title: "The Dude Abides Store - Think More Queerly",
+>   description:
+>     "Official merchandise from The Dude Abides. Unique designs that celebrate thinking differently.",
+> };
+>
+> export default function RootLayout({
+>   children,
+> }: {
+>   children: ReactNode;
+> }) {
+>   return (
+>     <html lang="en">
+>       <body>{children}</body>
+>     </html>
+>   );
+> }
+> EOF
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# tee "src/app/[channel]/(main)/layout.tsx" > /dev/null << 'EOF'
+> import type { ReactNode } from "react";
+> import { Header } from "@/ui/components/Header";
+> import { Footer } from "@/ui/components/Footer";
+>
+> export default async function MainLayout({
+>   children,
+>   params,
+> }: {
+>   children: ReactNode;
+>   params: Promise<{ channel: string }>;
+> }) {
+>   const { channel } = await params;
+>
+>   return (
+>     <div className="min-h-screen bg-dude-cream text-dude-dark-brown flex flex-col">
+>       <Header channel={channel} />
+>       <main className="flex-1">{children}</main>
+>       <Footer channel={channel} />
+>     </div>
+>   );
+> }
+> EOF
+root@WOPR:/opt/thedudeabides-store/storefront# cd /opt/thedudeabides-store/storefront
+root@WOPR:/opt/thedudeabides-store/storefront# pnpm build
+
+> saleor-storefront@0.1.0 prebuild /opt/thedudeabides-store/storefront
+> pnpm run generate
+
+
+> saleor-storefront@0.1.0 generate /opt/thedudeabides-store/storefront
+> graphql-codegen --config .graphqlrc.ts
+
+✔ Parse Configuration
+✔ Generate outputs
+
+> saleor-storefront@0.1.0 build /opt/thedudeabides-store/storefront
+
+./src/checkout/graphql/index.ts
+2:8  Warning: Using exported name 'gql' as identifier for default export.  import/no-named-as-default
+                                              ./src/checkout/hooks/useDebouncedSubmit.ts
+7:26  Warning: React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead.  react-hooks/exhaustive-deps
+                                              ./src/checkout/sections/PaymentSection/AdyenDropIn/AdyenDropIn.tsx
+43:5  Warning: React Hook useEffect has missing dependencies: 'config.data' and 'createAdyenCheckoutInstance'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/checkout/sections/PaymentSection/usePaymentGatewaysInitialize.ts
+57:5  Warning: React Hook useEffect has a missing dependency: 'onSubmit'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/checkout/sections/Summary/SummaryItem.tsx
+22:6  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api- ✓ Generating static pages (20/20)
+   Finalizing page optimization  .   Collectin ✓ Collecting build traces
+ ✓ Finalizing page optimization
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                      167 B         103 kB
+├ ○ /_not-found                            986 B         103 kB
+├ ● /[channel]                             396 B         111 kB
+├   └ /default-channel
+├ ● /[channel]/cart                      1.05 kB         112 kB
+├   └ /default-channel/cart
+├ ƒ /[channel]/categories/[slug]           397 B         111 kB
+├ ƒ /[channel]/collections/[slug]          397 B         111 kB
+├ ● /[channel]/login                       167 B         103 kB
+├   └ /default-channel/login
+├ ● /[channel]/orders                      397 B         111 kB
+├   └ /default-channel/orders
+├ ƒ /[channel]/pages/[slug]                167 B         103 kB
+├ ● /[channel]/products                    396 B         111 kB
+├   └ /default-channel/products
+├ ƒ /[channel]/products/[slug]             964 B         112 kB
+├ ● /[channel]/search                      396 B         111 kB
+├   └ /default-channel/search
+├ ƒ /api/draft                             167 B         103 kB
+├ ƒ /api/draft/disable                     167 B         103 kB
+├ ○ /apple-icon.png                          0 B            0 B
+├ ƒ /checkout                            1.35 kB         107 kB
+├ ○ /icon.png                                0 B            0 B
+├ ○ /icon.svg                                0 B            0 B
+├ ○ /opengraph-image.png                     0 B            0 B
+├ ○ /robots.txt                            167 B         103 kB
+└ ○ /twitter-image.png                       0 B            0 B
++ First Load JS shared by all             102 kB
+  ├ chunks/1673-9621727759569e77.js      46.1 kB
+  ├ chunks/a9752bb3-171ccb51b2c549a1.js  53.3 kB
+  └ other shared chunks (total)          3.02 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+root@WOPR:/opt/thedudeabides-store/storefront# cd /opt/thedudeabides-store
+root@WOPR:/opt/thedudeabides-store# docker compose ps
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+NAME                     IMAGE                                               COMMAND                  SERVICE                  CREATED        STATUS        PORTS
+saleor-api-dude          ghcr.io/saleor/saleor:3.20                          "gunicorn --bind :80…"   saleor-api-dude          23 hours ago   Up 13 hours   0.0.0.0:8000->8000/tcp
+saleor-dashboard-dude    ghcr.io/saleor/saleor-dashboard:3.20                "/docker-entrypoint.…"   saleor-dashboard-dude    3 days ago     Up 33 hours   0.0.0.0:9002->80/tcp
+saleor-postgres-dude     postgres:15-alpine                                  "docker-entrypoint.s…"   saleor-postgres-dude     23 hours ago   Up 23 hours   5432/tcp
+saleor-redis-dude        redis:7-alpine                                      "docker-entrypoint.s…"   saleor-redis-dude        23 hours ago   Up 23 hours   6379/tcp
+saleor-storefront-dude   thedudeabides-store-saleor-storefront-dude:latest   "docker-entrypoint.s…"   saleor-storefront-dude   12 hours ago   Up 12 hours   0.0.0.0:3001->3000/tcp
+root@WOPR:/opt/thedudeabides-store# cd /opt/thedudeabides-store
+root@WOPR:/opt/thedudeabides-store# docker compose build saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Building 550.9s (22/22) FINISHED docker:defaultACHED [saleor-storefront-dude deps  0.0s
+ => [saleor-storefront-dude internal] l  0.1s
+ => => transferring dockerfile: 2.14kB   0.0s
+ => [saleor-storefront-dude internal] l  1.4s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring context: 113B        0.0s
+ => [saleor-storefront-dude internal] l  1.1s
+ => => transferring context: 49.39MB     1.0s
+ => [saleor-storefront-dude base 1/1] F  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => [saleor-storefront-dude builder 3/5  1.0s
+ => [saleor-storefront-dude builder 4/5  0.9s
+ => [saleor-storefront-dude builder 5  539.3s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => [saleor-storefront-dude runner 6/7]  2.3s
+ => [saleor-storefront-dude runner 7/7]  0.2s
+ => [saleor-storefront-dude] exporting   1.3s
+ => => exporting layers                  1.2s
+ => => writing image sha256:59e0fd79b13  0.0s
+ => => naming to docker.io/library/thed  0.0s
+root@WOPR:/opt/thedudeabides-store# docker compose build saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Building 1.9s (22/22) FINISHED docker:default [saleor-storefront-dude internal] l  0.0s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring dockerfile: 2.14kB   0.0s
+ => [saleor-storefront-dude internal] l  1.5s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring context: 113B        0.0s
+ => [saleor-storefront-dude internal] l  0.2s
+ => => transferring context: 26.25kB     0.2s
+ => [saleor-storefront-dude base 1/1] F  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => CACHED [saleor-storefront-dude runn  0.0s
+ => [saleor-storefront-dude] exporting   0.0s
+ => => exporting layers                  0.0s
+ => => writing image sha256:59e0fd79b13  0.0s
+ => => naming to docker.io/library/thed  0.0s
+root@WOPR:/opt/thedudeabides-store# docker compose stop saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Stopping 0/0
+[+] Stopping 0/1eor-storefront-dude  Stopping0 ⠙ Container saleor-storefront-dude  Stopping0[+] Stopping 0/1
+[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 1/1eor-storefront-dude  Stopping0 ✔ Container saleor-storefront-dude  Stopped0.7s
+root@WOPR:/opt/thedudeabides-store# docker compose up -d saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+WARN[0000] Found orphan containers ([saleor-dashboard-dude]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+[+] Running 3/0
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 3/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.[+] Running 4/4
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-api-dude         Running0.0s
+ ✔ Container saleor-storefront-dude  Started0.6s
+root@WOPR:/opt/thedudeabides-store# docker exec -it saleor-storefront-dude ls -R /app/public/images
+ls: /app/public/images: No such file or directory
+root@WOPR:/opt/thedudeabides-store# ls -l /opt/thedudeabides-store/storefront/public/images
+total 48196
+-rwxr-x--- 1 root root 24800678 Nov 28 07:03 'Dude-sweater-design-shirt-6000x6000 (1).png'
+-rwxr-x--- 1 root root 23567415 Nov 28 07:05  dude_sweater_pattern-lg.png
+-rw-r--r-- 1 root root    21870 Nov 28 07:12  logo-100.png
+-rw-r--r-- 1 root root    74483 Nov 28 07:12  logo-200.png
+-rw-r--r-- 1 root root   240858 Nov 28 07:12  logo-400.png
+-rw-r--r-- 1 root root   316358 Nov 28 07:13  sweater-bg-tile.png
+-rw-r--r-- 1 root root   317867 Nov 28 07:23  sweater-bg-tile-visible.png
+root@WOPR:/opt/thedudeabides-store# at /opt/thedudeabides-store/storefront/Dockerfile
+syntax error. Last token seen: /
+Garbled time
+root@WOPR:/opt/thedudeabides-store# cat /opt/thedudeabides-store/storefront/Dockerfile
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm i --frozen-lockfile --prefer-offline
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Next.js collects completely anonymous telemetry data about general usage.
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line in case you want to disable telemetry during the build.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ENV NEXT_OUTPUT=standalone
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+# Get PNPM version from package.json
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN pnpm build
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# Uncomment the following line in case you want to disable telemetry during runtime.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+
+CMD ["node", "server.js"]
+root@WOPR:/opt/thedudeabides-store# sed -i 's|# COPY --from=builder /app/public ./public|COPY --from=builder /app/public ./public|' /opt/thedudeabides-store/storefront/Dockerfile
+root@WOPR:/opt/thedudeabides-store# grep COPY /opt/thedudeabides-store/storefront/DockerfileCOPY package.json pnpm-lock.yaml ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+root@WOPR:/opt/thedudeabides-store# cd /opt/thedudeabides-store
+root@WOPR:/opt/thedudeabides-store# docker compose stop saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Stopping 0/0
+[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 0/1eor-storefront-dude  Stopping0[+] Stopping 1/1eor-storefront-dude  Stopping0 ✔ Container saleor-storefront-dude  Stopped0.4s
+root@WOPR:/opt/thedudeabides-store# docker compose build --no-cache saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Building 1307.3s (23/23) FINISHED docker:defaultaleor-storefront-dude deps 3/5] R  0.4s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring dockerfile: 2.14kB   0.0s
+ => [saleor-storefront-dude internal] l  0.8s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring context: 113B        0.0s
+ => [saleor-storefront-dude internal] l  0.1s
+ => => transferring context: 26.25kB     0.1s
+ => CACHED [saleor-storefront-dude base  0.0s
+ => [saleor-storefront-dude deps 1/5] R  1.6s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => [saleor-storefront-dude runner 2/8]  0.3s
+ => [saleor-storefront-dude runner 3/8]  0.3s
+ => [saleor-storefront-dude deps 2/5] W  0.0s
+ => [saleor-storefront-dude deps 3/5] R  0.4s
+ => [saleor-storefront-dude deps 4/5] C  0.1s
+ => [saleor-storefront-dude deps 5/5]   93.6s
+ => [saleor-storefront-dude builder 2/  97.2s
+ => [saleor-storefront-dude builder 3/5  3.1s
+ => [saleor-storefront-dude builder 4/5  1.4s
+ => [saleor-storefront-dude builder   1000.1s
+ => [saleor-storefront-dude runner 4/8]  0.8s
+ => [saleor-storefront-dude runner 5/8]  0.7s
+ => [saleor-storefront-dude runner 6/8]  0.4s
+ => [saleor-storefront-dude runner 7/8  10.1s
+ => [saleor-storefront-dude runner 8/8]  0.2s
+ => [saleor-storefront-dude] exporting   3.5s
+ => => exporting layers                  3.5s
+ => => writing image sha256:04c87a6a670  0.0s
+ => => naming to docker.io/library/thed  0.0s
+root@WOPR:/opt/thedudeabides-store# docker logs saleor-storefront-dude --tail=200
+   ▲ Next.js 15.2.4
+   - Local:        http://abfda923d818:3000
+   - Network:      http://abfda923d818:3000
+
+ ✓ Starting...
+ ✓ Ready in 1834ms
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+ ⨯ The requested resource isn't a valid image for /images/logo-200.png received text/html; charset=utf-8
+root@WOPR:/opt/thedudeabides-store# cat /opt/thedudeabides-store/storefront/Dockerfile
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm i --frozen-lockfile --prefer-offline
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Next.js collects completely anonymous telemetry data about general usage.
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line in case you want to disable telemetry during the build.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ENV NEXT_OUTPUT=standalone
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+# Get PNPM version from package.json
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN pnpm build
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# Uncomment the following line in case you want to disable telemetry during runtime.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+
+CMD ["node", "server.js"]
+root@WOPR:/opt/thedudeabides-store# cat /opt/thedudeabides-store/storefront/Dockerfile
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm i --frozen-lockfile --prefer-offline
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Next.js collects completely anonymous telemetry data about general usage.
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line in case you want to disable telemetry during the build.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ENV NEXT_OUTPUT=standalone
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+# Get PNPM version from package.json
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN pnpm build
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# Uncomment the following line in case you want to disable telemetry during runtime.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+ARG NEXT_PUBLIC_SALEOR_API_URL
+ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+ARG NEXT_PUBLIC_STOREFRONT_URL
+ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+
+CMD ["node", "server.js"]
+root@WOPR:/opt/thedudeabides-store# mkdir -p /opt/thedudeabides-store/storefront/public/images
+root@WOPR:/opt/thedudeabides-store# mv /opt/thedudeabides-store/storefront/public/logo-*.png /opt/thedudeabides-store/storefront/public/images/
+mv: cannot stat '/opt/thedudeabides-store/storefront/public/logo-*.png': No such file or directory
+root@WOPR:/opt/thedudeabides-store# mv /opt/thedudeabides-store/storefront/public/sweater-bg*.png /opt/thedudeabides-store/storefront/public/images/
+mv: cannot stat '/opt/thedudeabides-store/storefront/public/sweater-bg*.png': No such file or directory
+root@WOPR:/opt/thedudeabides-store# mv /opt/thedudeabides-store/storefront/public/dude*.png /opt/thedudeabides-store/storefront/public/images/
+mv: cannot stat '/opt/thedudeabides-store/storefront/public/dude*.png': No such file or directory
+root@WOPR:/opt/thedudeabides-store# ls -R /opt/thedudeabides-store/storefront/public
+/opt/thedudeabides-store/storefront/public:
+github-mark.svg  images  screenshot.png
+
+/opt/thedudeabides-store/storefront/public/images:
+'Dude-sweater-design-shirt-6000x6000 (1).png'
+ dude_sweater_pattern-lg.png
+ logo-100.png
+ logo-200.png
+ logo-400.png
+ sweater-bg-tile.png
+ sweater-bg-tile-visible.png
+root@WOPR:/opt/thedudeabides-store# grep -R "logo" -n src
+grep: src: No such file or directory
+root@WOPR:/opt/thedudeabides-store# grep -R "sweater" -n src
+grep: src: No such file or directory
+root@WOPR:/opt/thedudeabides-store# grep -R "images/" -n src/ui
+grep: src/ui: No such file or directory
+root@WOPR:/opt/thedudeabides-store#
+root@WOPR:/opt/thedudeabides-store# cd /opt/thedudeabides-store/storefront
+root@WOPR:/opt/thedudeabides-store/storefront# grep -R "logo" -n src
+src/app/actions.ts:5:export async function logout() {
+src/gql/graphql.ts:1040:   * App's logos details.
+src/gql/graphql.ts:1046:  logo: AppBrandLogo;
+src/gql/graphql.ts:1050: * Represents the app's brand logo data.
+src/gql/graphql.ts:1059:   * URL to the default logo image.
+src/gql/graphql.ts:1070: * Represents the app's brand logo data.
+src/gql/graphql.ts:1391:   * App's logos details.
+src/gql/graphql.ts:1397:  logo: AppManifestBrandLogo;
+src/gql/graphql.ts:1410:   * Data URL with a base64 encoded logo image.
+src/gql/graphql.ts:7584:  logoutData?: Maybe<Scalars['JSONString']['output']>;
+src/ui/components/nav/components/UserMenu/UserMenu.tsx:9:import { logout } from "@/app/actions";
+src/ui/components/nav/components/UserMenu/UserMenu.tsx:52:                                 <form action={logout}>
+src/ui/components/Logo.tsx:15:      {/* Optimized responsive logo generated from 6000x6000 source */}
+src/ui/components/Logo.tsx:17:        src="/images/logo-200.png"
+src/ui/components/Logo.tsx:21:        className="logo-image flex-shrink-0 select-none"
+src/ui/components/Logo.tsx:32:  // Homepage: non-clickable logo
+src/ui/components/Logo.tsx:35:      <div className="flex items-center logo-link" aria-label={companyName}>
+src/ui/components/Logo.tsx:42:  // All other pages: linked logo
+src/ui/components/Logo.tsx:47:      className="flex items-center logo-link hover:text-dude-orange transition-colors"
+src/checkout/graphql/index.ts:5952:     logoutData?: Maybe<Scalars["JSONString"]>;
+root@WOPR:/opt/thedudeabides-store/storefront# grep -R "sweater" -n src
+src/app/dude-custom.css:44:/* Main - sweater pattern background */
+src/app/dude-custom.css:47:  background-image: url('/images/sweater-bg-tile.png') !important;
+root@WOPR:/opt/thedudeabides-store/storefront# grep -R "/images/" -n src
+src/app/dude-custom.css:47:  background-image: url('/images/sweater-bg-tile.png') !important;
+src/ui/components/Logo.tsx:17:        src="/images/logo-200.png"
+src/checkout/views/PageNotFound/PageNotFound.tsx:2:import { SaleorLogo } from "@/checkout/assets/images/SaleorLogo";
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# cat /opt/thedudeabides-store/storefront/.dockerignore
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+root@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# sudo chmod -R 755 /opt/thedudeabides-store/storefront/public
+sudo chmod -R 755 /opt/thedudeabides-store/storefront/public/imagesroot@WOPR:/opt/thedudeabides-store/storefront#
+root@WOPR:/opt/thedudeabides-store/storefront# tee /opt/thedudeabides-store/storefront/Dockerfile > /dev/null << 'EOF'
+> FROM node:20-alpine AS base
+>
+> # Install dependencies only when needed
+> FROM base AS deps
+> RUN apk add --no-cache libc6-compat
+> WORKDIR /app
+>
+> ENV PNPM_HOME="/pnpm"
+> ENV PATH="$PNPM_HOME:$PATH"
+> RUN corepack enable
+>
+> COPY package.json pnpm-lock.yaml ./
+> RUN pnpm i --frozen-lockfile --prefer-offline
+>
+> # Rebuild source when needed
+> FROM base AS builder
+> WORKDIR /app
+> COPY --from=deps /app/node_modules ./node_modules
+> COPY . .
+> COPY public ./public   # <-- REQUIRED: ensures images folder is included
+>
+> ENV NEXT_OUTPUT=standalone
+> ARG NEXT_PUBLIC_SALEOR_API_URL
+> ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+> ARG NEXT_PUBLIC_STOREFRONT_URL
+> ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+>
+> ENV PNPM_HOME="/pnpm"
+> ENV PATH="$PNPM_HOME:$PATH"
+> RUN corepack enable
+>
+> RUN pnpm build
+>
+> # Production runner
+> FROM base AS runner
+> WORKDIR /app
+>
+> ENV NODE_ENV=production
+>
+> ARG NEXT_PUBLIC_SALEOR_API_URL
+> ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+> ARG NEXT_PUBLIC_STOREFRONT_URL
+> ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+>
+> RUN addgroup --system --gid 1001 nodejs
+> RUN adduser --system --uid 1001 nextjs
+>
+> COPY --from=builder /app/public ./public
+>
+> RUN mkdir .next
+> RUN chown nextjs:nodejs .next
+>
+> COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+> COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+>
+> USER nextjs
+>
+> CMD ["node", "server.js"]
+> EOF
+root@WOPR:/opt/thedudeabides-store/storefront# cd /opt/thedudeabides-store
+root@WOPR:/opt/thedudeabides-store# docker compose stop saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Stopping 1/0
+ ✔ Container saleor-storefront-dude  Stopped0.0s
+root@WOPR:/opt/thedudeabides-store# docker compose build --no-cache saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Building 4.1s (16/23)      docker:default
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring dockerfile: 1.44kB   0.0s
+ => [saleor-storefront-dude internal] l  1.4s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring context: 113B        0.0s
+ => [saleor-storefront-dude internal] l  2.5s
+ => => transferring context: 49.70MB     2.5s
+ => CACHED [saleor-storefront-dude base  0.0s
+ => [saleor-storefront-dude deps 1/5] R  2.5s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => [saleor-storefront-dude runner 2/8]  0.5s
+ => [saleor-storefront-dude runner 3/8]  0.4s
+ => [saleor-storefront-dude deps 2/5] W  0.1s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude deps  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => ERROR [saleor-storefront-dude build  0.0s
+------
+ > [saleor-storefront-dude builder 4/6] COPY public ./public   # <-- REQUIRED: ensures images folder is included:
+------
+failed to solve: failed to compute cache key: failed to calculate checksum of ref 3d0ef6cf-0497-492a-b75f-3b9f74a816ae::ty1yt2i6r86rbhe2oy8rt5bov: "/REQUIRED:": not found
+root@WOPR:/opt/thedudeabides-store# docker compose up -d saleor-storefront-dudeRead from remote host 157.180.78.176: Connection reset by peer
+Connection to 157.180.78.176 closed.
+client_loop: send disconnect: Broken pipe
+~ $ ssh root@157.180.78.176
+root@157.180.78.176's password:
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-87-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Mon Nov 10 05:11:09 AM CST 2025
+
+  System load:  1.93               Processes:             283
+  Usage of /:   86.1% of 74.79GB   Users logged in:       0
+  Memory usage: 33%                IPv4 address for eth0: 157.180.78.176
+  Swap usage:   69%
+
+  => / is using 86.1% of 74.79GB
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+16 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+36 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+*** System restart required ***
+You have mail.
+Last login: Fri Nov 28 16:50:03 2025 from 66.226.109.200
+root@WOPR:~# tee /opt/thedudeabides-store/storefront/Dockerfile > /dev/null << 'EOF'
+> FROM node:20-alpine AS base
+>
+> FROM base AS deps
+> RUN apk add --no-cache libc6-compat
+> WORKDIR /app
+>
+> ENV PNPM_HOME="/pnpm"
+> ENV PATH="$PNPM_HOME:$PATH"
+> RUN corepack enable
+>
+> COPY package.json pnpm-lock.yaml ./
+> RUN pnpm i --frozen-lockfile --prefer-offline
+>
+> FROM base AS builder
+> WORKDIR /app
+> COPY --from=deps /app/node_modules ./node_modules
+> COPY . .
+> COPY public ./public
+>
+> ENV NEXT_OUTPUT=standalone
+> ARG NEXT_PUBLIC_SALEOR_API_URL
+> ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+> ARG NEXT_PUBLIC_STOREFRONT_URL
+> ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+>
+> ENV PNPM_HOME="/pnpm"
+> ENV PATH="$PNPM_HOME:$PATH"
+> RUN corepack enable
+>
+> RUN pnpm build
+>
+> FROM base AS runner
+> WORKDIR /app
+>
+> ENV NODE_ENV=production
+>
+> ARG NEXT_PUBLIC_SALEOR_API_URL
+> ENV NEXT_PUBLIC_SALEOR_API_URL=${NEXT_PUBLIC_SALEOR_API_URL}
+> ARG NEXT_PUBLIC_STOREFRONT_URL
+> ENV NEXT_PUBLIC_STOREFRONT_URL=${NEXT_PUBLIC_STOREFRONT_URL}
+>
+> RUN addgroup --system --gid 1001 nodejs
+> RUN adduser --system --uid 1001 nextjs
+>
+> COPY --from=builder /app/public ./public
+>
+> RUN mkdir .next
+> RUN chown nextjs:nodejs .next
+>
+> COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+> COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+>
+> USER nextjs
+> CMD ["node", "server.js"]
+> EOF
+root@WOPR:~# cd /opt/thedudeabides-store
+root@WOPR:/opt/thedudeabides-store# docker compose stop saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Stopping 1/0
+ ✔ Container saleor-storefront-dude  Stopped0.0s
+root@WOPR:/opt/thedudeabides-store# docker compose build --no-cache saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+[+] Building 1605.3s (24/24) FINISHED docker:defaultaleor-storefront-dude deps 4/5] C  0.1s
+ => [saleor-storefront-dude internal] l  0.1s
+ => => transferring dockerfile: 1.30kB   0.0s
+ => [saleor-storefront-dude internal] l  1.3s
+ => [saleor-storefront-dude internal] l  0.0s
+ => => transferring context: 113B        0.0s
+ => [saleor-storefront-dude internal] l  0.6s
+ => => transferring context: 26.25kB     0.5s
+ => CACHED [saleor-storefront-dude base  0.0s
+ => CACHED [saleor-storefront-dude buil  0.0s
+ => [saleor-storefront-dude deps 1/5] R  2.3s
+ => [saleor-storefront-dude runner 2/8]  0.4s
+ => [saleor-storefront-dude runner 3/8]  0.3s
+ => [saleor-storefront-dude deps 2/5] W  0.1s
+ => [saleor-storefront-dude deps 3/5] R  0.7s
+ => [saleor-storefront-dude deps 4/5] C  0.1s
+ => [saleor-storefront-dude deps 5/5]   92.2s
+ => [saleor-storefront-dude builder 2  132.9s
+ => [saleor-storefront-dude builder 3/6  2.1s
+ => [saleor-storefront-dude builder 4/6  0.5s
+ => [saleor-storefront-dude builder 5/6  1.5s
+ => [saleor-storefront-dude builder   1230.0s
+ => [saleor-storefront-dude runner 4/8]  2.0s
+ => [saleor-storefront-dude runner 5/8]  1.0s
+ => [saleor-storefront-dude runner 6/8]  1.0s
+ => [saleor-storefront-dude runner 7/8]  7.4s
+ => [saleor-storefront-dude runner 8/8]  0.4s
+ => [saleor-storefront-dude] exporting   3.9s
+ => => exporting layers                  3.9s
+ => => writing image sha256:6807ba58c21  0.0s
+ => => naming to docker.io/library/thed  0.0s
+root@WOPR:/opt/thedudeabides-store# docker compose up -d saleor-storefront-dude
+WARN[0000] /opt/thedudeabides-store/docker-compose.yml: `version` is obsolete
+WARN[0000] Found orphan containers ([saleor-dashboard-dude]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+[+] Running 3/0
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 3/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.[+] Running 4/4
+ ✔ Container saleor-postgres-dude    Running0.0s
+ ✔ Container saleor-redis-dude       Running0.0s
+ ✔ Container saleor-api-dude         Running0.0s
+ ✔ Container saleor-storefront-dude  Started1.4s
+root@WOPR:/opt/thedudeabides-store#
