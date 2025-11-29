@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@shared/schema";
+import { fetchProducts, fetchFeaturedProducts, type SaleorProduct } from "./saleor";
 
 async function fetchAPI(endpoint: string, options?: RequestInit) {
   const res = await fetch(`/api${endpoint}`, {
@@ -115,3 +116,19 @@ export function useSeedProducts() {
     },
   });
 }
+
+export function useSaleorProducts(channel: string = 'default-channel', first: number = 12) {
+  return useQuery({
+    queryKey: ["saleor-products", channel, first],
+    queryFn: () => fetchProducts(channel, first),
+  });
+}
+
+export function useSaleorFeaturedProducts(channel: string = 'default-channel') {
+  return useQuery({
+    queryKey: ["saleor-featured-products", channel],
+    queryFn: () => fetchFeaturedProducts(channel),
+  });
+}
+
+export type { SaleorProduct };
