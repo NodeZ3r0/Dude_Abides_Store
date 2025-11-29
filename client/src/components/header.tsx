@@ -8,10 +8,10 @@ import logoImage from "@assets/logo-400_1764430531407.png";
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-white/10">
-      <div className="w-full px-0 md:container md:mx-auto md:px-4 h-20 md:h-24 flex items-center justify-between">
+      <div className="w-full px-3 md:container md:mx-auto md:px-4 h-20 md:h-24 flex items-center">
         
-        {/* Mobile Menu & Search (Left on Mobile) */}
-        <div className="flex items-center gap-0 md:hidden">
+        {/* Mobile Menu & Search (Left on Mobile) - equal width column */}
+        <div className="flex flex-1 basis-0 items-center gap-0 md:hidden">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
@@ -32,7 +32,7 @@ export function Header() {
           </Button>
         </div>
 
-        {/* Logo - Left on Desktop, Center on Mobile */}
+        {/* Logo - Center on Mobile, Left on Desktop */}
         <div className="flex-1 md:flex-none flex justify-center md:justify-start">
           <Link href="/" className="flex items-center group">
             <img 
@@ -62,8 +62,8 @@ export function Header() {
           <Link href="/shop" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80">Shop</Link>
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        {/* Actions - equal width column on mobile, right-aligned */}
+        <div className="flex flex-1 basis-0 items-center justify-end gap-2 md:flex-none md:basis-auto">
           <div className="hidden md:flex items-center gap-2 text-sm font-medium mr-4 text-foreground/80 hover:text-primary cursor-pointer">
              <User className="h-5 w-5" />
              <span>Login</span>
