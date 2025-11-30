@@ -1,32 +1,33 @@
-name: Deploy to VPS
+name: Deploy Frontend to VPS
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    env:
+      DEPLOY_PATH: /opt/Dude_Abides_Store
+      ARTIFACT_NAME: dist.tar.gz
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - run: npm run build
 
-      - name: Setup SSH
+      - name: Create dist tarball
+        run: tar -czf ${{ env.ARTIFACT_NAME }} -C dist .
+
+      - name: Start ssh-agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
@@ -36,30 +37,29 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to VPS
+      - name: Copy artifact to VPS
+        run: scp ${{ env.ARTIFACT_NAME }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/
+
+      - name: Deploy on VPS
         run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
-            cd /opt/Dude_Abides_Store
-            git pull origin main
-            
-            # If there's a frontend to build
-            if [ -f "package.json" ]; then
-              npm install
-              npm run build 2>/dev/null || true
-            fi
-            
-            # Restart relevant Docker services
-            cd /opt/thedudeabides-store/storefront
-            docker compose pull
-            docker compose up -d --build
-            
-            echo "Deployment complete!"
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} <<'ENDSSH'
+            set -euo pipefail
+            DEPLOY_PATH=/opt/Dude_Abides_Store
+
+            sudo systemctl stop dudeabides-frontend || true
+            mkdir -p $DEPLOY_PATH/dist
+            mv ~/dist.tar.gz $DEPLOY_PATH/
+            cd $DEPLOY_PATH
+            rm -rf dist/*
+            tar -xzf dist.tar.gz -C dist
+            rm -f dist.tar.gz
+            sudo chown -R www-data:www-data dist
+            sudo systemctl daemon-reload
+            sudo systemctl start dudeabides-frontend
+            sudo systemctl status dudeabides-frontend --no-pager
           ENDSSH
 
       - name: Health check
         run: |
           sleep 10
-          curl -f https://dudeabides.wopr.systems/ || echo "Warning: Health check returned non-200"
-          curl -f -X POST https://dudeabides.wopr.systems/graphql/ \
-            -H 'Content-Type: application/json' \
-            -d '{"query": "{ __typename }"}' || echo "Warning: GraphQL health check failed"
+          curl -f https://dudeabides.wopr.systems/ || exit 1
