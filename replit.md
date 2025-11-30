@@ -145,9 +145,10 @@ Preferred communication style: Simple, everyday language.
 
 **Caddy Config**: `/etc/caddy/sites-enabled/dudeabides.wopr.systems.caddy`
 
-**Channels**
-- `default-channel`: Main sales channel (products synced here)
-- `the-dude-abides-shop`: Additional channel (created but not primary)
+**Multi-Domain Channel Architecture**
+- `the-dude-abides-shop`: The Dude Abides store channel (THIS storefront)
+- `default-channel`: Separate domain/store (NOT related to this project)
+- Each domain maps to its own Saleor channel for multi-tenant setup
 
 ## Replit Staging Environment
 
@@ -155,7 +156,7 @@ This Replit project serves as a **staging/development environment** for testing 
 
 **Configuration**
 - Saleor API URL: `https://dudeabides.wopr.systems/graphql/`
-- Saleor Channel: `default-channel` (configured in `client/src/lib/saleor.ts`)
+- Saleor Channel: `the-dude-abides-shop` (this store's dedicated channel)
 
 **Purpose**
 - Visual testing of component/styling changes
@@ -187,7 +188,4 @@ This Replit project serves as a **staging/development environment** for testing 
 7. Added dynamic Categories section to homepage (displays Saleor categories with fallback UI)
 8. Fixed multi-channel support: Using `the-dude-abides-shop` channel (correct for this store, supports future multi-domain setup)
 
-**Note**: Saleor currently has no products synced. Run Printful sync on VPS to populate data:
-```bash
-curl -X POST http://localhost:8055/sync
-```
+**Note**: The Printful sync service on the VPS needs to be configured to sync products to `the-dude-abides-shop` channel (not default-channel). Products must be published to the correct channel for this storefront to display them.
