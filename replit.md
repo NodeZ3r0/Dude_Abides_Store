@@ -179,4 +179,15 @@ This Replit project serves as a **staging/development environment** for testing 
 2. Configured Printful sync service with proper SALEOR_API_URL
 3. Generated new Saleor API token with MANAGE_PRODUCTS permission
 4. Successfully synced first product (Snapback Hat) from Printful to Saleor with 17 color variants
-5. Updated Replit staging to use `default-channel` for Saleor queries
+5. **CORS Fix**: Created server-side proxy routes to bypass browser CORS restrictions when calling Saleor API:
+   - `/api/saleor/products` - Fetches products for specified channel
+   - `/api/saleor/categories` - Fetches all categories
+   - `/api/saleor/collections` - Fetches collections for specified channel
+6. Updated frontend hooks to use server proxy instead of direct Saleor calls
+7. Added dynamic Categories section to homepage (displays Saleor categories with fallback UI)
+8. Fixed multi-channel support: Using `the-dude-abides-shop` channel (correct for this store, supports future multi-domain setup)
+
+**Note**: Saleor currently has no products synced. Run Printful sync on VPS to populate data:
+```bash
+curl -X POST http://localhost:8055/sync
+```

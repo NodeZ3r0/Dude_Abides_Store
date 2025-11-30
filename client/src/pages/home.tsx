@@ -34,7 +34,7 @@ export default function Home() {
   const { data: products, isLoading, error } = useProducts();
   const { data: saleorProducts, isLoading: saleorLoading, error: saleorError } = useSaleorProducts(undefined, 8);
   const { data: saleorCategories, isLoading: categoriesLoading } = useSaleorCategories(10);
-  const { data: saleorCollections, isLoading: collectionsLoading } = useSaleorCollections(10);
+  const { data: saleorCollections, isLoading: collectionsLoading } = useSaleorCollections(undefined, 10);
   const seedMutation = useSeedProducts();
 
   const handleSeedData = () => {
@@ -267,6 +267,84 @@ export default function Home() {
                </Button>
             </div>
          </div>
+      </section>
+
+      {/* Categories from Saleor */}
+      <section className="py-20 bg-[#1a120f] border-t border-white/5">
+        <div className="container mx-auto px-4">
+          <h2 className="font-display text-2xl md:text-3xl text-center text-[#e8dac9] mb-4 tracking-wide">
+            {saleorCategories && saleorCategories.length > 0 ? "Shop by Category" : "Browse Categories"}
+          </h2>
+          <p className="text-center text-sm text-white/50 mb-12">
+            Find exactly what you're looking for
+          </p>
+          
+          {categoriesLoading && (
+            <div className="text-center py-8">
+              <p className="text-white/50">Loading categories...</p>
+            </div>
+          )}
+          
+          {saleorCategories && saleorCategories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {saleorCategories.slice(0, 8).map((category: SaleorCategory) => (
+                <div 
+                  key={category.id} 
+                  className="group cursor-pointer" 
+                  data-testid={`category-${category.slug}`}
+                >
+                  <div className="aspect-square bg-[#2a201c] overflow-hidden rounded-sm mb-4 flex items-center justify-center border border-white/10 hover:border-[#c45d36] transition-colors">
+                    {category.backgroundImage?.url ? (
+                      <img 
+                        src={category.backgroundImage.url} 
+                        alt={category.backgroundImage.alt || category.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center p-4">
+                        <span className="font-display text-[#e8dac9] text-lg text-center group-hover:text-[#c45d36] transition-colors">
+                          {category.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-display text-[#e8dac9] text-sm text-center leading-tight group-hover:text-[#c45d36] transition-colors">
+                    {category.name}
+                  </h3>
+                  {category.children && category.children.edges.length > 0 && (
+                    <p className="text-xs text-white/40 text-center mt-1">
+                      {category.children.edges.length} subcategories
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : !categoriesLoading && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { title: "Apparel", icon: "👕" },
+                { title: "Accessories", icon: "🎒" },
+                { title: "Home & Living", icon: "🏠" },
+                { title: "Drinkware", icon: "☕" }
+              ].map((cat, idx) => (
+                <div key={idx} className="group cursor-pointer">
+                  <div className="aspect-square bg-[#2a201c] overflow-hidden rounded-sm mb-4 flex items-center justify-center border border-white/10 hover:border-[#c45d36] transition-colors">
+                    <span className="text-5xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                  </div>
+                  <h3 className="font-display text-[#e8dac9] text-sm text-center leading-tight group-hover:text-[#c45d36] transition-colors">
+                    {cat.title}
+                  </h3>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <div className="text-center mt-12">
+            <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-2 text-xs font-bold uppercase tracking-widest rounded-sm">
+              View All Categories
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* Collections List - From Saleor or Fallback */}

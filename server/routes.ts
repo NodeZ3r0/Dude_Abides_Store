@@ -2,12 +2,218 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 
+const SALEOR_API_URL = process.env.SALEOR_API_URL || 'https://dudeabides.wopr.systems/graphql/';
+const DEFAULT_CHANNEL = process.env.SALEOR_CHANNEL || 'the-dude-abides-shop';
+
+const PRODUCT_LIST_QUERY = `
+  query ProductList($channel: String!, $first: Int) {
+    products(channel: $channel, first: $first) {
+      edges {
+        node {
+          id
+          name
+          slug
+          description
+          thumbnail {
+            url
+            alt
+          }
+          pricing {
+            priceRange {
+              start {
+                gross {
+                  amount
+                  currency
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CATEGORIES_QUERY = `
+  query Categories($first: Int) {
+    categories(first: $first) {
+      edges {
+        node {
+          id
+          name
+          slug
+          description
+          backgroundImage {
+            url
+            alt
+          }
+          children(first: 10) {
+            edges {
+              node {
+                id
+                name
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const COLLECTIONS_QUERY = `
+  query Collections($channel: String!, $first: Int) {
+    collections(channel: $channel, first: $first) {
+      edges {
+        node {
+          id
+          name
+          slug
+          backgroundImage {
+            url
+            alt
+          }
+        }
+      }
+    }
+  }
+`;
+
+const FEATURED_PRODUCTS_QUERY = `
+  query FeaturedProducts($channel: String!, $slug: String!) {
+    collection(channel: $channel, slug: $slug) {
+      id
+      name
+      products(first: 8) {
+        edges {
+          node {
+            id
+            name
+            slug
+            thumbnail {
+              url
+              alt
+            }
+            pricing {
+              priceRange {
+                start {
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+async function saleorRequest(query: string, variables: Record<string, any>) {
+  const response = await fetch(SALEOR_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Saleor API error: ${response.status} - ${text}`);
+  }
+
+  const json = await response.json();
+  
+  if (json.errors && json.errors.length > 0) {
+    const errorMessages = json.errors.map((e: any) => e.message).join(', ');
+    throw new Error(`Saleor GraphQL error: ${errorMessages}`);
+  }
+
+  return json.data;
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
   const { insertProductSchema, insertCartItemSchema } = await import("@shared/schema");
   const { z } = await import("zod");
+
+  // Saleor proxy routes - bypass CORS by making requests server-side
+  app.get("/api/saleor/products", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const first = parseInt(req.query.first as string) || 12;
+      
+      console.log(`[Saleor Proxy] Fetching products - channel: ${channel}, first: ${first}`);
+      
+      const data = await saleorRequest(PRODUCT_LIST_QUERY, { channel, first });
+      const products = data.products?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched ${products.length} products`);
+      res.json(products);
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Products error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/saleor/categories", async (req, res) => {
+    try {
+      const first = parseInt(req.query.first as string) || 20;
+      
+      console.log(`[Saleor Proxy] Fetching categories - first: ${first}`);
+      
+      const data = await saleorRequest(CATEGORIES_QUERY, { first });
+      const categories = data.categories?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched ${categories.length} categories`);
+      res.json(categories);
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Categories error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/saleor/collections", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const first = parseInt(req.query.first as string) || 10;
+      
+      console.log(`[Saleor Proxy] Fetching collections - channel: ${channel}, first: ${first}`);
+      
+      const data = await saleorRequest(COLLECTIONS_QUERY, { channel, first });
+      const collections = data.collections?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched ${collections.length} collections`);
+      res.json(collections);
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Collections error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/saleor/featured", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const slug = (req.query.slug as string) || 'featured';
+      
+      console.log(`[Saleor Proxy] Fetching featured products - channel: ${channel}, collection: ${slug}`);
+      
+      const data = await saleorRequest(FEATURED_PRODUCTS_QUERY, { channel, slug });
+      const products = data.collection?.products?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched ${products.length} featured products`);
+      res.json(products);
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Featured products error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Product routes
   app.get("/api/products", async (req, res) => {

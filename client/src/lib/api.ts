@@ -1,10 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@shared/schema";
 import { 
-  fetchProducts, 
-  fetchFeaturedProducts, 
-  fetchCategories,
-  fetchCollections,
   getChannel,
   type SaleorProduct,
   type SaleorCategory,
@@ -22,7 +18,7 @@ async function fetchAPI(endpoint: string, options?: RequestInit) {
   
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: "Request failed" }));
-    throw new Error(error.message || `HTTP ${res.status}`);
+    throw new Error(error.message || error.error || `HTTP ${res.status}`);
   }
   
   return res.json();
@@ -130,7 +126,7 @@ export function useSaleorProducts(channel?: string, first: number = 12) {
   const activeChannel = channel || getChannel();
   return useQuery({
     queryKey: ["saleor-products", activeChannel, first],
-    queryFn: () => fetchProducts(activeChannel, first),
+    queryFn: () => fetchAPI(`/saleor/products?channel=${encodeURIComponent(activeChannel)}&first=${first}`) as Promise<SaleorProduct[]>,
   });
 }
 
@@ -138,21 +134,22 @@ export function useSaleorFeaturedProducts(channel?: string, collectionSlug: stri
   const activeChannel = channel || getChannel();
   return useQuery({
     queryKey: ["saleor-featured-products", activeChannel, collectionSlug],
-    queryFn: () => fetchFeaturedProducts(activeChannel, collectionSlug),
+    queryFn: () => fetchAPI(`/saleor/featured?channel=${encodeURIComponent(activeChannel)}&slug=${encodeURIComponent(collectionSlug)}`) as Promise<SaleorProduct[]>,
   });
 }
 
 export function useSaleorCategories(first: number = 20) {
   return useQuery({
     queryKey: ["saleor-categories", first],
-    queryFn: () => fetchCategories(first),
+    queryFn: () => fetchAPI(`/saleor/categories?first=${first}`) as Promise<SaleorCategory[]>,
   });
 }
 
-export function useSaleorCollections(first: number = 10) {
+export function useSaleorCollections(channel?: string, first: number = 10) {
+  const activeChannel = channel || getChannel();
   return useQuery({
-    queryKey: ["saleor-collections", first],
-    queryFn: () => fetchCollections(first),
+    queryKey: ["saleor-collections", activeChannel, first],
+    queryFn: () => fetchAPI(`/saleor/collections?channel=${encodeURIComponent(activeChannel)}&first=${first}`) as Promise<SaleorCollection[]>,
   });
 }
 
