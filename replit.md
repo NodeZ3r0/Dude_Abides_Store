@@ -116,3 +116,67 @@ Preferred communication style: Simple, everyday language.
 **Session Management**
 - Session storage configured via `connect-pg-simple` (PostgreSQL session store)
 - Allows guest checkout without requiring user authentication
+
+## VPS Production Environment (dudeabides.wopr.systems)
+
+**Infrastructure**
+- VPS hosted at dudeabides.wopr.systems
+- Caddy reverse proxy handling SSL/TLS
+- Cloudflare CDN in front
+
+**Saleor Backend**
+- **Saleor API**: Port 8000 (container: saleor-api-dude)
+- **Saleor Dashboard**: Port 9002 (container: saleor-dashboard-dude)
+- **Saleor Worker**: (container: saleor-worker-dude)
+- **PostgreSQL**: (container: saleor-postgres-dude)
+- **Redis**: (container: saleor-redis-dude)
+
+**Next.js Storefront (VPS)**
+- Located at `/opt/thedudeabides-store/storefront/`
+- Port 3001 (maps to internal 3000)
+- Container: saleor-storefront
+
+**Printful Sync Service**
+- Located at `/opt/printful-sync/`
+- Port 8055
+- Syncs products from Printful to Saleor
+- Trigger sync: `curl -X POST http://localhost:8055/sync`
+- SALEOR_TOKEN: `lethwrqrb5ur5MPtLwzemb68OgSPGX` (has MANAGE_PRODUCTS permission)
+
+**Caddy Config**: `/etc/caddy/sites-enabled/dudeabides.wopr.systems.caddy`
+
+**Channels**
+- `default-channel`: Main sales channel (products synced here)
+- `the-dude-abides-shop`: Additional channel (created but not primary)
+
+## Replit Staging Environment
+
+This Replit project serves as a **staging/development environment** for testing component and styling changes before deploying to the VPS production storefront.
+
+**Configuration**
+- Saleor API URL: `https://dudeabides.wopr.systems/graphql/`
+- Saleor Channel: `default-channel` (configured in `client/src/lib/saleor.ts`)
+
+**Purpose**
+- Visual testing of component/styling changes
+- Frontend development without affecting production
+- Real-time product data sync from production Saleor
+
+## Brand Design
+
+**Color Scheme**
+- `#4a2c2a` (dude-brown) - Primary background
+- `#f5e6d3` (dude-cream) - Primary text/accent
+- `#ff6b35` (dude-orange) - Call-to-action/highlights
+
+**Typography**
+- Display font: Oswald
+- Body font: Inter
+
+## Recent Changes (Nov 30, 2025)
+
+1. Fixed VPS storefront 502 error by starting the Next.js storefront container
+2. Configured Printful sync service with proper SALEOR_API_URL
+3. Generated new Saleor API token with MANAGE_PRODUCTS permission
+4. Successfully synced first product (Snapback Hat) from Printful to Saleor with 17 color variants
+5. Updated Replit staging to use `default-channel` for Saleor queries
