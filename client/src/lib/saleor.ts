@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 
 const SALEOR_API_URL = import.meta.env.VITE_SALEOR_API_URL || 'https://dudeabides.wopr.systems/graphql/';
-const SALEOR_CHANNEL = import.meta.env.VITE_SALEOR_CHANNEL || 'default-channel';
+const SALEOR_CHANNEL = import.meta.env.VITE_SALEOR_CHANNEL || 'the-dude-abides-shop';
 
 export const saleorClient = new GraphQLClient(SALEOR_API_URL, {
   headers: {
