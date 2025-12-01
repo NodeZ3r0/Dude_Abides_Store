@@ -18,6 +18,17 @@ const PRODUCT_LIST_QUERY = `
             url
             alt
           }
+          media {
+            id
+            url
+            alt
+            type
+          }
+          category {
+            id
+            name
+            slug
+          }
           pricing {
             priceRange {
               start {
@@ -26,6 +37,40 @@ const PRODUCT_LIST_QUERY = `
                   currency
                 }
               }
+              stop {
+                gross {
+                  amount
+                  currency
+                }
+              }
+            }
+          }
+          variants {
+            id
+            name
+            sku
+            pricing {
+              price {
+                gross {
+                  amount
+                  currency
+                }
+              }
+            }
+            attributes {
+              attribute {
+                name
+                slug
+              }
+              values {
+                name
+                slug
+              }
+            }
+            media {
+              id
+              url
+              alt
             }
           }
         }
@@ -106,6 +151,89 @@ const FEATURED_PRODUCTS_QUERY = `
               }
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+const PRODUCT_DETAIL_QUERY = `
+  query ProductDetail($slug: String!, $channel: String!) {
+    product(slug: $slug, channel: $channel) {
+      id
+      name
+      slug
+      description
+      seoTitle
+      seoDescription
+      thumbnail {
+        url
+        alt
+      }
+      media {
+        id
+        url
+        alt
+        type
+      }
+      category {
+        id
+        name
+        slug
+      }
+      pricing {
+        priceRange {
+          start {
+            gross {
+              amount
+              currency
+            }
+          }
+          stop {
+            gross {
+              amount
+              currency
+            }
+          }
+        }
+      }
+      variants {
+        id
+        name
+        sku
+        quantityAvailable
+        pricing {
+          price {
+            gross {
+              amount
+              currency
+            }
+          }
+        }
+        attributes {
+          attribute {
+            name
+            slug
+          }
+          values {
+            name
+            slug
+          }
+        }
+        media {
+          id
+          url
+          alt
+        }
+      }
+      attributes {
+        attribute {
+          name
+          slug
+        }
+        values {
+          name
+          slug
         }
       }
     }
@@ -211,6 +339,28 @@ export async function registerRoutes(
       res.json(products);
     } catch (error: any) {
       console.error("[Saleor Proxy] Featured products error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Single product detail with variants and all images
+  app.get("/api/saleor/product/:slug", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const slug = req.params.slug;
+      
+      console.log(`[Saleor Proxy] Fetching product detail - slug: ${slug}, channel: ${channel}`);
+      
+      const data = await saleorRequest(PRODUCT_DETAIL_QUERY, { slug, channel });
+      
+      if (!data.product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      console.log(`[Saleor Proxy] Fetched product: ${data.product.name} with ${data.product.variants?.length || 0} variants`);
+      res.json(data.product);
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Product detail error:", error.message);
       res.status(500).json({ error: error.message });
     }
   });
