@@ -174,7 +174,28 @@ This Replit project serves as a **staging/development environment** for testing 
 - Display font: Oswald
 - Body font: Inter
 
-## Recent Changes (Nov 30, 2025)
+## Recent Changes (Dec 1, 2025)
+
+### Dashboard Login Fix (CRITICAL)
+**Problem**: Saleor Dashboard login always failed with "password invalid" even though API curl tests worked.
+
+**Root Cause**: The dashboard container had the API URL baked into the HTML at build time as `http://localhost:8000/graphql/` instead of the correct external URL. This meant browsers were trying to authenticate against localhost on the user's device, not the server.
+
+**Fix**: Recreate the dashboard container with the correct `API_URL` environment variable:
+```bash
+docker stop saleor-dashboard-dude && docker rm saleor-dashboard-dude
+docker run -d \
+  --name saleor-dashboard-dude \
+  --network authentik_default \
+  -p 9002:80 \
+  -e API_URL=https://dudeabides.wopr.systems/graphql/ \
+  -e APP_MOUNT_URI=/dashboard/ \
+  ghcr.io/saleor/saleor-dashboard:3.20
+```
+
+**Verification**: `curl https://dudeabides.wopr.systems/dashboard/ | grep API_URL` should show the correct URL.
+
+### Previous Changes (Nov 30, 2025)
 
 1. Fixed VPS storefront 502 error by starting the Next.js storefront container
 2. Configured Printful sync service with proper SALEOR_API_URL
