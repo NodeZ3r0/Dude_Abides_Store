@@ -3,7 +3,29 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 
 const SALEOR_API_URL = process.env.SALEOR_API_URL || 'https://dudeabides.wopr.systems/graphql/';
+const SALEOR_MEDIA_URL = process.env.SALEOR_MEDIA_URL || 'https://dudeabides.wopr.systems';
 const DEFAULT_CHANNEL = process.env.SALEOR_CHANNEL || 'the-dude-abides-shop';
+
+// Rewrite Saleor media URLs from internal Docker URLs to public URLs
+function rewriteMediaUrls(obj: any): any {
+  if (!obj) return obj;
+  if (typeof obj === 'string') {
+    // Rewrite localhost:8000 URLs to the public Saleor URL
+    return obj.replace(/http:\/\/localhost:8000/g, SALEOR_MEDIA_URL)
+              .replace(/http:\/\/saleor-api-dude:8000/g, SALEOR_MEDIA_URL);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => rewriteMediaUrls(item));
+  }
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const key of Object.keys(obj)) {
+      result[key] = rewriteMediaUrls(obj[key]);
+    }
+    return result;
+  }
+  return obj;
+}
 
 const PRODUCT_LIST_QUERY = `
   query ProductList($channel: String!, $first: Int) {
@@ -283,7 +305,7 @@ export async function registerRoutes(
       const products = data.products?.edges?.map((edge: any) => edge.node) || [];
       
       console.log(`[Saleor Proxy] Fetched ${products.length} products`);
-      res.json(products);
+      res.json(rewriteMediaUrls(products));
     } catch (error: any) {
       console.error("[Saleor Proxy] Products error:", error.message);
       res.status(500).json({ error: error.message });
@@ -300,7 +322,7 @@ export async function registerRoutes(
       const categories = data.categories?.edges?.map((edge: any) => edge.node) || [];
       
       console.log(`[Saleor Proxy] Fetched ${categories.length} categories`);
-      res.json(categories);
+      res.json(rewriteMediaUrls(categories));
     } catch (error: any) {
       console.error("[Saleor Proxy] Categories error:", error.message);
       res.status(500).json({ error: error.message });
@@ -318,7 +340,7 @@ export async function registerRoutes(
       const collections = data.collections?.edges?.map((edge: any) => edge.node) || [];
       
       console.log(`[Saleor Proxy] Fetched ${collections.length} collections`);
-      res.json(collections);
+      res.json(rewriteMediaUrls(collections));
     } catch (error: any) {
       console.error("[Saleor Proxy] Collections error:", error.message);
       res.status(500).json({ error: error.message });
@@ -336,7 +358,7 @@ export async function registerRoutes(
       const products = data.collection?.products?.edges?.map((edge: any) => edge.node) || [];
       
       console.log(`[Saleor Proxy] Fetched ${products.length} featured products`);
-      res.json(products);
+      res.json(rewriteMediaUrls(products));
     } catch (error: any) {
       console.error("[Saleor Proxy] Featured products error:", error.message);
       res.status(500).json({ error: error.message });
@@ -358,7 +380,7 @@ export async function registerRoutes(
       }
       
       console.log(`[Saleor Proxy] Fetched product: ${data.product.name} with ${data.product.variants?.length || 0} variants`);
-      res.json(data.product);
+      res.json(rewriteMediaUrls(data.product));
     } catch (error: any) {
       console.error("[Saleor Proxy] Product detail error:", error.message);
       res.status(500).json({ error: error.message });
