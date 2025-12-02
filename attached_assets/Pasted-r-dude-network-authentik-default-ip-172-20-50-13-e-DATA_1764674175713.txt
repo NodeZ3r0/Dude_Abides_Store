@@ -1,0 +1,48 @@
+r-dude \
+>   --network authentik_default --ip 172.20.50.13 \
+>   -e DATABASE_URL="postgres://saleor:saleor@172.20.50.10:5432/saleor" \
+>   -e REDIS_URL="redis://172.20.50.11:6379/1" \
+>   -e SECRET_KEY="$SECRET" \
+>   -e ALLOWED_CLIENT_HOSTS="dudeabides.wopr.systems,localhost" \
+>   ghcr.io/saleor/saleor:3.20
+80bcce9e19d43f94a0a22cab45c74b2380b9fdbe214399e958b378479d1703a2
+root@WOPR:~#
+root@WOPR:~# sleep 5
+
+root@WOPR:~# docker logs saleor-api-dude --tail 10
+root@WOPR:~#
+root@WOPR:~# docker logs saleor-api-dude --tail 15
+  File "/usr/local/lib/python3.12/site-packages/django/core/asgi.py", line 12, in get_asgi_application
+    django.setup(set_prefix=False)
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 124, in populate
+    app_config.ready()
+  File "/app/saleor/core/apps.py", line 19, in ready
+    self.validate_jwt_manager()
+  File "/app/saleor/core/apps.py", line 37, in validate_jwt_manager
+    validate_method()
+  File "/app/saleor/core/jwt_manager.py", line 206, in validate_configuration
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Variable RSA_PRIVATE_KEY is not provided. It is required for running in not DEBUG mode.
+]
+
+root@WOPR:~# curl -s http://localhost:8000/graphql/ -H "Content-Type: application/json" -d '{"query":"{ shop { name } }"}' | head
+root@WOPR:~# docker logs saleor-api-dude --tail 15
+  File "/usr/local/lib/python3.12/site-packages/django/core/asgi.py", line 12, in get_asgi_application
+    django.setup(set_prefix=False)
+  File "/usr/local/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/usr/local/lib/python3.12/site-packages/django/apps/registry.py", line 124, in populate
+    app_config.ready()
+  File "/app/saleor/core/apps.py", line 19, in ready
+    self.validate_jwt_manager()
+  File "/app/saleor/core/apps.py", line 37, in validate_jwt_manager
+    validate_method()
+  File "/app/saleor/core/jwt_manager.py", line 206, in validate_configuration
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: Variable RSA_PRIVATE_KEY is not provided. It is required for running in not DEBUG mode.
+]
+
+root@WOPR:~# curl -s http://localhost:8000/graphql/ -H "Content-Type: application/json" -d '{"query":"{ shop { name } }"}' | head
+root@WOPR:~#
