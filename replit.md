@@ -187,34 +187,51 @@ This Replit project serves as a **staging/development environment** for testing 
 
 ## Recent Changes (Dec 2, 2025)
 
-### Static IP Infrastructure Fix (CRITICAL)
-**Problem**: Docker containers kept getting different IP addresses after restarts, causing DNS resolution issues where the Saleor API couldn't connect to PostgreSQL.
+### Successful Printful Product Sync with Variants
+**Status**: Working - Snapback Hat with 17 color variants now displaying at $33 each
 
-**Root Cause**: Docker's embedded DNS was caching old IP addresses even after container and daemon restarts. The API container would resolve `saleor-postgres-dude` to an old IP (e.g., 172.20.0.6) while postgres was actually at a new IP (e.g., 172.20.0.3).
+**Key Fixes Applied**:
 
-**Fix**: Recreated all Saleor containers with static IP addresses on the `authentik_default` network:
-```bash
-docker run -d --name saleor-postgres-dude \
-  --network authentik_default --ip 172.20.50.10 \
-  -e POSTGRES_DB=saleor -e POSTGRES_USER=saleor -e POSTGRES_PASSWORD=saleor \
-  -v saleor_postgres:/var/lib/postgresql/data \
-  postgres:15-alpine
+1. **Static IP Infrastructure Fix (CRITICAL)**
+   - Docker containers now use static IPs on `authentik_default` network (172.20.50.x range)
+   - Prevents DNS caching issues after container restarts
+   - Database URLs use static IPs instead of container names
 
-docker run -d --name saleor-api-dude \
-  --network authentik_default --ip 172.20.50.12 \
-  -p 8000:8000 \
-  -e DATABASE_URL="postgres://saleor:saleor@172.20.50.10:5432/saleor" \
-  -e REDIS_URL="redis://172.20.50.11:6379/1" \
-  -e SECRET_KEY="<secure-key>" \
-  -e ALLOWED_HOSTS="127.0.0.1,localhost,dudeabides.wopr.systems,*" \
-  -e DEBUG=True \
-  ghcr.io/saleor/saleor:3.20
-```
+2. **Channel Recreation**
+   - Recreated `the-dude-abides-shop` channel after loss during container rebuild
+   - Channel ID: `Q2hhbm5lbDoy` (Channel:2)
+   - Currency: USD
 
-**Key Points**:
-- Database URLs now use static IPs instead of container names to avoid DNS issues
-- Static IPs in the 172.20.50.x range to avoid DHCP conflicts
-- Running with DEBUG=True for now (RSA key configuration can be added later for production mode)
+3. **ProductType Variant Configuration (CRITICAL)**
+   - ProductType must have `has_variants=True` 
+   - Size and Color attributes must be assigned as **variant attributes** via `AttributeVariant` model
+   - In Saleor 3.20: `Attribute` and `AttributeVariant` are in `saleor.attribute.models`, NOT `saleor.product.models`
+
+4. **Warehouse Assignment**
+   - Created warehouse with ID: `V2FyZWhvdXNlOjk1MzY4Mjk0LTM0ZjktNDQxOC1iZjlhLWEzZWQwZTg4MTNjNw==`
+   - Updated Printful sync service with correct warehouse ID
+
+5. **Tax Configuration (CRITICAL)**
+   - GraphQL pricing queries fail with `KeyError: 2` without tax config
+   - Must create TaxConfiguration for each channel:
+   ```python
+   from saleor.tax.models import TaxConfiguration
+   from saleor.channel.models import Channel
+   channel = Channel.objects.get(slug='the-dude-abides-shop')
+   TaxConfiguration.objects.get_or_create(
+       channel=channel,
+       defaults={
+           'charge_taxes': False,
+           'tax_calculation_strategy': 'FLAT_RATES',
+           'display_gross_prices': True,
+           'prices_entered_with_tax': True
+       }
+   )
+   ```
+
+6. **Printful Sync Token**
+   - Token: `uVEM2HyJkerckvn0u5FALpnVAG50zW`
+   - Permissions: MANAGE_PRODUCTS, MANAGE_PRODUCT_TYPES_AND_ATTRIBUTES
 
 ### Django Site Entry Required
 After running migrations, you must create the Django Site entry for Saleor to work:
@@ -229,6 +246,15 @@ Site.objects.update_or_create(
     }
 )
 ```
+
+### Static IP Reference Table
+| Container | Static IP | Port |
+|-----------|-----------|------|
+| saleor-postgres-dude | 172.20.50.10 | 5432 |
+| saleor-redis-dude | 172.20.50.11 | 6379 |
+| saleor-api-dude | 172.20.50.12 | 8000 |
+| saleor-worker-dude | 172.20.50.13 | - |
+| saleor-dashboard-dude | 172.20.50.14 | 9002 |
 
 ## Previous Changes (Dec 1, 2025)
 
