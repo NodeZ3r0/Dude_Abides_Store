@@ -10,10 +10,14 @@ import About from "@/pages/about";
 import Products from "@/pages/products";
 import ProductDetail from "@/pages/product-detail";
 import Cart from "@/pages/cart";
+import Checkout from "@/pages/checkout";
 import Category from "@/pages/category";
 import Collection from "@/pages/collection";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import Account from "@/pages/account";
 
 function Router() {
   return (
@@ -23,10 +27,14 @@ function Router() {
       <Route path="/products" component={Products} />
       <Route path="/products/:slug" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
+      <Route path="/checkout" component={Checkout} />
       <Route path="/category/:slug" component={Category} />
       <Route path="/collection/:slug" component={Collection} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/account" component={Account} />
       <Route component={NotFound} />
     </Switch>
   );

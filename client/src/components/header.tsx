@@ -1,14 +1,55 @@
 import { Link } from "wouter";
-import { ShoppingBag, User, Menu, Search } from "lucide-react";
+import { ShoppingBag, User, Menu, Search, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import logoImage from "@assets/logo-400_1764430531407.png";
 import { useCart } from "@/lib/cart-context";
+import { useState, useEffect } from "react";
+
+interface UserData {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 export function Header() {
   const { getItemCount } = useCart();
   const itemCount = getItemCount();
+  const [user, setUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    setUser(null);
+    window.location.href = "/";
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-white/10">
@@ -29,6 +70,19 @@ export function Header() {
                 <Link href="/about" className="text-2xl font-display hover:text-primary transition-colors">About The Dude</Link>
                 <Link href="/blog" className="text-2xl font-display hover:text-primary transition-colors">Blog</Link>
                 <Link href="/cart" className="text-2xl font-display hover:text-primary transition-colors">Cart ({itemCount})</Link>
+                <div className="border-t border-white/10 pt-6">
+                  {user ? (
+                    <>
+                      <Link href="/account" className="text-xl font-display hover:text-primary transition-colors block mb-4">My Account</Link>
+                      <button onClick={handleLogout} className="text-xl font-display text-red-400 hover:text-red-300 transition-colors">Sign Out</button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" className="text-2xl font-display hover:text-primary transition-colors block mb-4">Login</Link>
+                      <Link href="/register" className="text-2xl font-display hover:text-primary transition-colors">Create Account</Link>
+                    </>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
@@ -69,10 +123,37 @@ export function Header() {
 
         {/* Actions - equal width column on mobile, right-aligned */}
         <div className="flex flex-1 basis-0 items-center justify-end gap-2 md:flex-none md:basis-auto">
-          <div className="hidden md:flex items-center gap-2 text-sm font-medium mr-4 text-foreground/80 hover:text-primary cursor-pointer">
-             <User className="h-5 w-5" />
-             <span>Login</span>
-          </div>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="hidden md:flex items-center gap-2 text-sm font-medium mr-4 text-foreground/80 hover:text-primary cursor-pointer" data-testid="btn-user-menu">
+                  <User className="h-5 w-5" />
+                  <span>{user.firstName || user.email.split('@')[0]}</span>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-[#2a201c] border-white/10">
+                <DropdownMenuItem asChild className="text-[#e8dac9] focus:text-[#e8dac9] focus:bg-white/10 cursor-pointer">
+                  <Link href="/account">My Account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  onClick={handleLogout} 
+                  className="text-red-400 focus:text-red-300 focus:bg-red-900/20 cursor-pointer"
+                  data-testid="btn-logout"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/login">
+              <div className="hidden md:flex items-center gap-2 text-sm font-medium mr-4 text-foreground/80 hover:text-primary cursor-pointer" data-testid="btn-login">
+                <User className="h-5 w-5" />
+                <span>Login</span>
+              </div>
+            </Link>
+          )}
           
           <Link href="/cart">
             <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary transition-colors" data-testid="btn-cart">

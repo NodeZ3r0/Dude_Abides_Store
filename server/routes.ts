@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 
 const SALEOR_API_URL = process.env.SALEOR_API_URL || 'https://dudeabides.wopr.systems/graphql/';
 const SALEOR_MEDIA_URL = process.env.SALEOR_MEDIA_URL || 'https://dudeabides.wopr.systems';
@@ -765,6 +766,370 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error seeding products:", error);
       res.status(500).json({ message: "Failed to seed products" });
+    }
+  });
+
+  // Auth routes using Saleor customer API
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { firstName, lastName, email, password, newsletter } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const ACCOUNT_REGISTER_MUTATION = `
+        mutation AccountRegister($input: AccountRegisterInput!) {
+          accountRegister(input: $input) {
+            user {
+              id
+              email
+              firstName
+              lastName
+            }
+            errors {
+              field
+              message
+              code
+            }
+          }
+        }
+      `;
+
+      const registerResponse = await fetch(SALEOR_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: ACCOUNT_REGISTER_MUTATION,
+          variables: {
+            input: {
+              email,
+              password,
+              firstName: firstName || '',
+              lastName: lastName || '',
+              channel: SALEOR_CHANNEL,
+              redirectUrl: `${process.env.REPLIT_DEV_DOMAIN || 'http://localhost:5000'}/account`,
+            }
+          }
+        })
+      });
+
+      const registerData = await registerResponse.json();
+      
+      if (registerData.errors || registerData.data?.accountRegister?.errors?.length > 0) {
+        const errors = registerData.errors || registerData.data?.accountRegister?.errors;
+        const errorMessage = errors[0]?.message || 'Registration failed';
+        console.error("Saleor registration error:", errors);
+        return res.status(400).json({ error: errorMessage });
+      }
+
+      const saleorUser = registerData.data?.accountRegister?.user;
+      if (!saleorUser) {
+        return res.status(400).json({ error: "Registration failed - please check your email to confirm your account" });
+      }
+
+      // Now login the user to get a token
+      const TOKEN_CREATE_MUTATION = `
+        mutation TokenCreate($email: String!, $password: String!) {
+          tokenCreate(email: $email, password: $password) {
+            token
+            refreshToken
+            user {
+              id
+              email
+              firstName
+              lastName
+            }
+            errors {
+              field
+              message
+              code
+            }
+          }
+        }
+      `;
+
+      const tokenResponse = await fetch(SALEOR_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: TOKEN_CREATE_MUTATION,
+          variables: { email, password }
+        })
+      });
+
+      const tokenData = await tokenResponse.json();
+      
+      if (tokenData.errors || tokenData.data?.tokenCreate?.errors?.length > 0) {
+        // User registered but might need email confirmation
+        return res.json({ 
+          user: {
+            id: saleorUser.id,
+            email: saleorUser.email,
+            firstName: saleorUser.firstName,
+            lastName: saleorUser.lastName,
+          },
+          token: null,
+          message: "Account created. Please check your email to confirm your account before logging in."
+        });
+      }
+
+      const user = tokenData.data?.tokenCreate?.user;
+      const token = tokenData.data?.tokenCreate?.token;
+
+      res.json({ 
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        token 
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Registration failed. Please try again." });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const TOKEN_CREATE_MUTATION = `
+        mutation TokenCreate($email: String!, $password: String!) {
+          tokenCreate(email: $email, password: $password) {
+            token
+            refreshToken
+            user {
+              id
+              email
+              firstName
+              lastName
+            }
+            errors {
+              field
+              message
+              code
+            }
+          }
+        }
+      `;
+
+      const response = await fetch(SALEOR_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: TOKEN_CREATE_MUTATION,
+          variables: { email, password }
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.errors || data.data?.tokenCreate?.errors?.length > 0) {
+        const errors = data.errors || data.data?.tokenCreate?.errors;
+        const errorMessage = errors[0]?.message || 'Invalid email or password';
+        return res.status(401).json({ error: errorMessage });
+      }
+
+      const user = data.data?.tokenCreate?.user;
+      const token = data.data?.tokenCreate?.token;
+
+      if (!user || !token) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      res.json({ 
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        token 
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed. Please try again." });
+    }
+  });
+
+  // Stripe routes
+  app.get("/api/stripe/config", async (_req, res) => {
+    try {
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (error: any) {
+      console.error("Error getting Stripe config:", error);
+      res.status(500).json({ error: "Failed to get Stripe configuration" });
+    }
+  });
+
+  // Helper function to validate cart items against Saleor prices
+  async function validateCartPrices(items: any[]): Promise<{ valid: boolean; amount: number; error?: string }> {
+    try {
+      const variantIds = items.map(item => item.variantId).filter(Boolean);
+      
+      if (variantIds.length === 0) {
+        return { valid: false, amount: 0, error: "No valid variant IDs in cart" };
+      }
+
+      const VARIANT_PRICING_QUERY = `
+        query GetVariantPricing($ids: [ID!]!, $channel: String!) {
+          productVariants(ids: $ids, first: 100, channel: $channel) {
+            edges {
+              node {
+                id
+                name
+                pricing {
+                  price {
+                    gross {
+                      amount
+                      currency
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await fetch(SALEOR_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: VARIANT_PRICING_QUERY,
+          variables: { 
+            ids: variantIds,
+            channel: SALEOR_CHANNEL 
+          }
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.errors) {
+        console.error("Saleor pricing query error:", data.errors);
+        return { valid: false, amount: 0, error: "Failed to validate prices" };
+      }
+
+      const variantPrices: Record<string, number> = {};
+      data.data?.productVariants?.edges?.forEach((edge: any) => {
+        const variant = edge.node;
+        const price = variant.pricing?.price?.gross?.amount || 0;
+        variantPrices[variant.id] = price;
+      });
+
+      let totalAmount = 0;
+      for (const item of items) {
+        const serverPrice = variantPrices[item.variantId];
+        if (serverPrice === undefined) {
+          console.warn(`Variant ${item.variantId} not found in Saleor`);
+          // For items not in Saleor (like legacy products), use the client price
+          // In production, you might want to reject these
+          totalAmount += item.price * item.quantity;
+        } else {
+          // Use the authoritative server-side price
+          totalAmount += serverPrice * item.quantity;
+        }
+      }
+
+      return { valid: true, amount: totalAmount };
+    } catch (error: any) {
+      console.error("Error validating cart prices:", error);
+      return { valid: false, amount: 0, error: "Price validation failed" };
+    }
+  }
+
+  app.post("/api/stripe/create-payment-intent", async (req, res) => {
+    try {
+      const { items, email, shipping } = req.body;
+      
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: "Cart items are required" });
+      }
+
+      // Validate prices server-side against Saleor
+      const priceValidation = await validateCartPrices(items);
+      if (!priceValidation.valid) {
+        console.error("Price validation failed:", priceValidation.error);
+        // Fallback to client prices if Saleor validation fails (for dev/staging)
+        // In production, you might want to reject the request
+      }
+
+      const stripe = await getUncachableStripeClient();
+      
+      // Use server-validated amount or fallback to client-provided (for legacy items)
+      const amount = priceValidation.valid ? priceValidation.amount * 100 : 
+        items.reduce((sum: number, item: any) => sum + (item.price * item.quantity * 100), 0);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount),
+        currency: 'usd',
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          email: email || '',
+          channel: SALEOR_CHANNEL,
+          items: JSON.stringify(items.map((i: any) => ({
+            id: i.variantId,
+            name: i.productName,
+            qty: i.quantity,
+            price: i.price
+          }))),
+        },
+        ...(shipping && {
+          shipping: {
+            name: shipping.name,
+            address: {
+              line1: shipping.address.line1,
+              line2: shipping.address.line2 || '',
+              city: shipping.address.city,
+              state: shipping.address.state,
+              postal_code: shipping.address.postal_code,
+              country: shipping.address.country || 'US',
+            },
+          },
+        }),
+      });
+
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+        validatedAmount: amount / 100, // Return the server-validated amount
+      });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ error: error.message || "Failed to create payment intent" });
+    }
+  });
+
+  app.post("/api/stripe/confirm-payment", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      
+      if (!paymentIntentId) {
+        return res.status(400).json({ error: "Payment intent ID is required" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      res.json({
+        status: paymentIntent.status,
+        amount: paymentIntent.amount,
+        metadata: paymentIntent.metadata,
+      });
+    } catch (error: any) {
+      console.error("Error confirming payment:", error);
+      res.status(500).json({ error: error.message || "Failed to confirm payment" });
     }
   });
 

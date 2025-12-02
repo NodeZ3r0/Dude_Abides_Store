@@ -150,13 +150,15 @@ export default function Cart() {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full bg-[#c45d36] hover:bg-[#a04d2e] text-white py-6 text-lg uppercase tracking-wider"
-                  data-testid="btn-checkout"
-                >
-                  Checkout
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href="/checkout">
+                  <Button 
+                    className="w-full bg-[#c45d36] hover:bg-[#a04d2e] text-white py-6 text-lg uppercase tracking-wider"
+                    data-testid="btn-checkout"
+                  >
+                    Checkout
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
 
                 <p className="text-xs text-white/40 text-center mt-4">
                   Taxes calculated at checkout
