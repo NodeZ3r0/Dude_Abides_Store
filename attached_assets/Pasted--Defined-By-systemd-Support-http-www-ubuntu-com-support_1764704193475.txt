@@ -1,0 +1,111 @@
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ The unit dude-storefront.service has entered the 'failed' state with result 'resources'.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+░░ Subject: A start job for unit dude-storefront.service has failed
+░░ Defined-By: systemd
+░░ Support: http://www.ubuntu.com/support
+░░
+░░ A start job for unit dude-storefront.service has finished with a failure.
+░░
+░░ The job identifier is 4061895 and the job result is failed.
+root@NodeZ3r0:~# # Check node path and .env file
+root@NodeZ3r0:~# which node
+/usr/bin/node
+root@NodeZ3r0:~# cat /opt/thedudeabides-store/storefront/.env
+ront/dist/index.cjs
+
+# Reset the service failure counter and check full logs
+systemctl reset-failed dude-storefront.service
+journalctl -u dude-storefront.service -n 50 --no-pagercat: /opt/thedudeabides-store/storefront/.env: No such file or directory
+root@NodeZ3r0:~# ls -la /opt/thedudeabides-store/storefront/dist/index.cjs
+ls: cannot access '/opt/thedudeabides-store/storefront/dist/index.cjs': No such file or directory
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Reset the service failure counter and check full logs
+root@NodeZ3r0:~# systemctl reset-failed dude-storefront.service
+root@NodeZ3r0:~# journalctl -u dude-storefront.service -n 50 --no-pager
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to load environment files: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to spawn 'start' task: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Scheduled restart job, restart counter is at 1.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to load environment files: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to spawn 'start' task: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Scheduled restart job, restart counter is at 2.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to load environment files: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to spawn 'start' task: No such file or directory
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:34 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Scheduled restart job, restart counter is at 3.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to load environment files: No such file or directory
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to spawn 'start' task: No such file or directory
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Scheduled restart job, restart counter is at 4.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to load environment files: No such file or directory
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed to spawn 'start' task: No such file or directory
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Scheduled restart job, restart counter is at 5.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Start request repeated too quickly.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: dude-storefront.service: Failed with result 'resources'.
+Dec 02 19:25:35 NodeZ3r0 systemd[1]: Failed to start dude-storefront.service - The Dude Abides Storefront.
+root@NodeZ3r0:~# # Check the storefront directory
+root@NodeZ3r0:~# ls -la /opt/thedudeabides-store/storefront/
+ls: cannot access '/opt/thedudeabides-store/storefront/': No such file or directory
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Check if there's a dist folder
+root@NodeZ3r0:~# ls -la /opt/thedudeabides-store/storefront/dist/ 2>/dev/null || echo "No dist folder"
+No dist folder
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Recreate .env file
+root@NodeZ3r0:~# cat > /opt/thedudeabides-store/storefront/.env << 'EOF'
+> DATABASE_URL=postgresql://saleor:saleor@172.20.50.10:5432/saleor
+> PORT=3001
+> NODE_ENV=production
+> EOF
+-bash: /opt/thedudeabides-store/storefront/.env: No such file or directory
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Rebuild the app
+root@NodeZ3r0:~# cd /opt/thedudeabides-store/storefront
+-bash: cd: /opt/thedudeabides-store/storefront: No such file or directory
+root@NodeZ3r0:~# pnpm install
+Command 'pnpm' not found, did you mean:
+  command 'npm' from deb npm (9.2.0~ds1-2)
+Try: apt install <deb name>
+root@NodeZ3r0:~# pnpm build
+Command 'pnpm' not found, did you mean:
+  command 'npm' from deb npm (9.2.0~ds1-2)
+Try: apt install <deb name>
+root@NodeZ3r0:~# # Check the storefront directory
+root@NodeZ3r0:~# ls -la /opt/thedudeabides-store/storefront/
+ls: cannot access '/opt/thedudeabides-store/storefront/': No such file or directory
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Check if there's a dist folder
+root@NodeZ3r0:~# ls -la /opt/thedudeabides-store/storefront/dist/ 2>/dev/null || echo "No dist folder"
+No dist folder
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Recreate .env file
+root@NodeZ3r0:~# cat > /opt/thedudeabides-store/storefront/.env << 'EOF'
+> DATABASE_URL=postgresql://saleor:saleor@172.20.50.10:5432/saleor
+> PORT=3001
+> NODE_ENV=production
+> EOF
+-bash: /opt/thedudeabides-store/storefront/.env: No such file or directory
+root@NodeZ3r0:~#
+root@NodeZ3r0:~# # Rebuild the app
+root@NodeZ3r0:~# cd /opt/thedudeabides-store/storefront
+-bash: cd: /opt/thedudeabides-store/storefront: No such file or directory
+root@NodeZ3r0:~# pnpm install
+Command 'pnpm' not found, did you mean:
+  command 'npm' from deb npm (9.2.0~ds1-2)
+Try: apt install <deb name>
+root@NodeZ3r0:~# pnpm build
+Command 'pnpm' not found, did you mean:
+  command 'npm' from deb npm (9.2.0~ds1-2)
+Try: apt install <deb name>
+root@NodeZ3r0:~#
+root@NodeZ3r0:~#
