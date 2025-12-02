@@ -217,4 +217,30 @@ export function useSaleorProduct(slug: string, channel?: string) {
   });
 }
 
+export interface SaleorCategoryWithProducts extends SaleorCategory {
+  products: SaleorProduct[];
+}
+
+export interface SaleorCollectionWithProducts extends SaleorCollection {
+  products: SaleorProduct[];
+}
+
+export function useSaleorCategoryBySlug(slug: string, channel?: string) {
+  const activeChannel = channel || getChannel();
+  return useQuery({
+    queryKey: ["saleor-category", slug, activeChannel],
+    queryFn: () => fetchAPI(`/saleor/category/${encodeURIComponent(slug)}?channel=${encodeURIComponent(activeChannel)}`) as Promise<SaleorCategoryWithProducts>,
+    enabled: !!slug,
+  });
+}
+
+export function useSaleorCollectionBySlug(slug: string, channel?: string) {
+  const activeChannel = channel || getChannel();
+  return useQuery({
+    queryKey: ["saleor-collection", slug, activeChannel],
+    queryFn: () => fetchAPI(`/saleor/collection/${encodeURIComponent(slug)}?channel=${encodeURIComponent(activeChannel)}`) as Promise<SaleorCollectionWithProducts>,
+    enabled: !!slug,
+  });
+}
+
 export type { SaleorProduct, SaleorCategory, SaleorCollection };

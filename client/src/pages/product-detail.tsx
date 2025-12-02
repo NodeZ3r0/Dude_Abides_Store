@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { useSaleorProduct, type SaleorProductDetail } from "@/lib/api";
@@ -17,6 +17,12 @@ export default function ProductDetail() {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0 && !selectedVariant) {
+      setSelectedVariant(product.variants[0].id);
+    }
+  }, [product, selectedVariant]);
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {

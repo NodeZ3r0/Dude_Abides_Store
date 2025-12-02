@@ -62,7 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       ));
     } else {
       const newItem: CartItem = {
-        id: `${product.id}-${variantId}-${Date.now()}`,
+        id: `${product.id}-${variantId}`,
         productId: product.id,
         productSlug: product.slug,
         productName: product.name,

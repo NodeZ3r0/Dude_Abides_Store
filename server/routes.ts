@@ -179,6 +179,116 @@ const FEATURED_PRODUCTS_QUERY = `
   }
 `;
 
+const PRODUCTS_BY_CATEGORY_QUERY = `
+  query ProductsByCategory($channel: String!, $categorySlug: String!, $first: Int) {
+    products(channel: $channel, first: $first, filter: { categories: [$categorySlug] }) {
+      edges {
+        node {
+          id
+          name
+          slug
+          description
+          thumbnail {
+            url
+            alt
+          }
+          category {
+            id
+            name
+            slug
+          }
+          pricing {
+            priceRange {
+              start {
+                gross {
+                  amount
+                  currency
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CATEGORY_BY_SLUG_QUERY = `
+  query CategoryBySlug($slug: String!, $channel: String!) {
+    category(slug: $slug) {
+      id
+      name
+      slug
+      description
+      backgroundImage {
+        url
+        alt
+      }
+      products(channel: $channel, first: 50) {
+        edges {
+          node {
+            id
+            name
+            slug
+            thumbnail {
+              url
+              alt
+            }
+            pricing {
+              priceRange {
+                start {
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const COLLECTION_BY_SLUG_QUERY = `
+  query CollectionBySlug($channel: String!, $slug: String!) {
+    collection(channel: $channel, slug: $slug) {
+      id
+      name
+      slug
+      description
+      backgroundImage {
+        url
+        alt
+      }
+      products(first: 50) {
+        edges {
+          node {
+            id
+            name
+            slug
+            thumbnail {
+              url
+              alt
+            }
+            pricing {
+              priceRange {
+                start {
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const PRODUCT_DETAIL_QUERY = `
   query ProductDetail($slug: String!, $channel: String!) {
     product(slug: $slug, channel: $channel) {
@@ -383,6 +493,60 @@ export async function registerRoutes(
       res.json(rewriteMediaUrls(data.product));
     } catch (error: any) {
       console.error("[Saleor Proxy] Product detail error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Category with products by slug
+  app.get("/api/saleor/category/:slug", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const slug = req.params.slug;
+      
+      console.log(`[Saleor Proxy] Fetching category with products - slug: ${slug}, channel: ${channel}`);
+      
+      const data = await saleorRequest(CATEGORY_BY_SLUG_QUERY, { slug, channel });
+      
+      if (!data.category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+      
+      const products = data.category.products?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched category: ${data.category.name} with ${products.length} products`);
+      res.json(rewriteMediaUrls({
+        ...data.category,
+        products
+      }));
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Category error:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Collection with products by slug
+  app.get("/api/saleor/collection/:slug", async (req, res) => {
+    try {
+      const channel = (req.query.channel as string) || DEFAULT_CHANNEL;
+      const slug = req.params.slug;
+      
+      console.log(`[Saleor Proxy] Fetching collection with products - slug: ${slug}, channel: ${channel}`);
+      
+      const data = await saleorRequest(COLLECTION_BY_SLUG_QUERY, { channel, slug });
+      
+      if (!data.collection) {
+        return res.status(404).json({ error: 'Collection not found' });
+      }
+      
+      const products = data.collection.products?.edges?.map((edge: any) => edge.node) || [];
+      
+      console.log(`[Saleor Proxy] Fetched collection: ${data.collection.name} with ${products.length} products`);
+      res.json(rewriteMediaUrls({
+        ...data.collection,
+        products
+      }));
+    } catch (error: any) {
+      console.error("[Saleor Proxy] Collection error:", error.message);
       res.status(500).json({ error: error.message });
     }
   });
