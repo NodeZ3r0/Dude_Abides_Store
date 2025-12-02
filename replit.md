@@ -142,10 +142,18 @@ All Saleor containers use static IP addresses on the `authentik_default` network
 - **PostgreSQL**: (container: saleor-postgres-dude, IP: 172.20.50.10)
 - **Redis**: (container: saleor-redis-dude, IP: 172.20.50.11)
 
-**Next.js Storefront (VPS)**
+**Storefront (VPS)**
 - Located at `/opt/thedudeabides-store/storefront/`
 - Port 3001 (maps to internal 3000)
 - Container: saleor-storefront
+- **GitHub Repo**: `https://github.com/NodeZ3r0/Dude_Abides_Store.git`
+- **CRITICAL**: VPS must pull from NodeZ3r0/Dude_Abides_Store.git, NOT saleor/storefront.git
+
+**Auto-Deploy Pipeline**
+- Timer: `dude-deploy.timer` runs every 5 minutes
+- Script: `/opt/thedudeabides-store/deploy.sh`
+- Email alerts on failure: stephen.falken@wopr.systems (rate-limited 1x per 24hr)
+- Workflow: Replit → GitHub push → VPS auto-pulls within 5 min
 
 **Printful Sync Service**
 - Located at `/opt/printful-sync/`
