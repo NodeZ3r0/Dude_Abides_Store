@@ -124,12 +124,23 @@ Preferred communication style: Simple, everyday language.
 - Caddy reverse proxy handling SSL/TLS
 - Cloudflare CDN in front
 
+**Docker Network: authentik_default (Static IPs)**
+All Saleor containers use static IP addresses on the `authentik_default` network (subnet: 172.20.0.0/16) to prevent DNS caching issues:
+
+| Container | Static IP | Port |
+|-----------|-----------|------|
+| saleor-postgres-dude | 172.20.50.10 | 5432 |
+| saleor-redis-dude | 172.20.50.11 | 6379 |
+| saleor-api-dude | 172.20.50.12 | 8000 |
+| saleor-worker-dude | 172.20.50.13 | - |
+| saleor-dashboard-dude | 172.20.50.14 | 9002 |
+
 **Saleor Backend**
-- **Saleor API**: Port 8000 (container: saleor-api-dude)
-- **Saleor Dashboard**: Port 9002 (container: saleor-dashboard-dude)
-- **Saleor Worker**: (container: saleor-worker-dude)
-- **PostgreSQL**: (container: saleor-postgres-dude)
-- **Redis**: (container: saleor-redis-dude)
+- **Saleor API**: Port 8000 (container: saleor-api-dude, IP: 172.20.50.12)
+- **Saleor Dashboard**: Port 9002 (container: saleor-dashboard-dude, IP: 172.20.50.14)
+- **Saleor Worker**: (container: saleor-worker-dude, IP: 172.20.50.13)
+- **PostgreSQL**: (container: saleor-postgres-dude, IP: 172.20.50.10)
+- **Redis**: (container: saleor-redis-dude, IP: 172.20.50.11)
 
 **Next.js Storefront (VPS)**
 - Located at `/opt/thedudeabides-store/storefront/`
@@ -174,7 +185,52 @@ This Replit project serves as a **staging/development environment** for testing 
 - Display font: Oswald
 - Body font: Inter
 
-## Recent Changes (Dec 1, 2025)
+## Recent Changes (Dec 2, 2025)
+
+### Static IP Infrastructure Fix (CRITICAL)
+**Problem**: Docker containers kept getting different IP addresses after restarts, causing DNS resolution issues where the Saleor API couldn't connect to PostgreSQL.
+
+**Root Cause**: Docker's embedded DNS was caching old IP addresses even after container and daemon restarts. The API container would resolve `saleor-postgres-dude` to an old IP (e.g., 172.20.0.6) while postgres was actually at a new IP (e.g., 172.20.0.3).
+
+**Fix**: Recreated all Saleor containers with static IP addresses on the `authentik_default` network:
+```bash
+docker run -d --name saleor-postgres-dude \
+  --network authentik_default --ip 172.20.50.10 \
+  -e POSTGRES_DB=saleor -e POSTGRES_USER=saleor -e POSTGRES_PASSWORD=saleor \
+  -v saleor_postgres:/var/lib/postgresql/data \
+  postgres:15-alpine
+
+docker run -d --name saleor-api-dude \
+  --network authentik_default --ip 172.20.50.12 \
+  -p 8000:8000 \
+  -e DATABASE_URL="postgres://saleor:saleor@172.20.50.10:5432/saleor" \
+  -e REDIS_URL="redis://172.20.50.11:6379/1" \
+  -e SECRET_KEY="<secure-key>" \
+  -e ALLOWED_HOSTS="127.0.0.1,localhost,dudeabides.wopr.systems,*" \
+  -e DEBUG=True \
+  ghcr.io/saleor/saleor:3.20
+```
+
+**Key Points**:
+- Database URLs now use static IPs instead of container names to avoid DNS issues
+- Static IPs in the 172.20.50.x range to avoid DHCP conflicts
+- Running with DEBUG=True for now (RSA key configuration can be added later for production mode)
+
+### Django Site Entry Required
+After running migrations, you must create the Django Site entry for Saleor to work:
+```python
+# docker exec -it saleor-api-dude python manage.py shell
+from django.contrib.sites.models import Site
+Site.objects.update_or_create(
+    id=1,
+    defaults={
+        "domain": "dudeabides.wopr.systems",
+        "name": "The Dude Abides Store"
+    }
+)
+```
+
+## Previous Changes (Dec 1, 2025)
 
 ### Dashboard Login Fix (CRITICAL)
 **Problem**: Saleor Dashboard login always failed with "password invalid" even though API curl tests worked.

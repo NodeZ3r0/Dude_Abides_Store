@@ -1,0 +1,56 @@
+  Applying menu.0019_menu_slug... OK            Applying menu.0020_auto_20201223_0845... OK
+  Applying menu.0021_auto_20210308_1135... OK
+  Applying menu.0022_alter_menuitemtranslation_language_code... OK
+  Applying order.0165_fix_order_charge_status_with_transactions... OK
+  Applying order.0170_merge_20231030_0857... OK
+  Applying order.0174_merge_20231030_1033... OK
+  Applying order.0175_merge_20231030_1040... OK
+  Applying order.0178_merge_20231030_1055... OK
+  Applying order.0171_order_order_user_email_user_id_idx... OK                                Applying order.0175_merge_20231122_1040... OK                                               Applying order.0176_merge_20231122_1346... OK                                               Applying order.0179_merge_20231122_1348... OK
+  Applying order.0180_auto_20231108_0908... OK
+  Applying order.0181_order_subtotal_as_a_field... OK
+  Applying order.0182_orderline_is_gift... OK   Applying order.0183_order_tax_error... OK
+  Applying order.0172_update_order_cc_addresses... OK
+  Applying order.0176_merge_20240325_1315... OK                                               Applying order.0177_merge_20240325_1329... OK
+  Applying order.0180_merge_20240325_1333... OK
+  Applying order.0182_merge_20240325_1338... OK
+  Applying order.0184_merge_0182_merge_20240325_1338_0183_order_tax_error... OK
+  Applying order.0173_alter_orderline_unit_discount_type_add_is_price_overridden... OK        Applying order.0177_merge_20240606_1022... OK                                               Applying order.0178_merge_20240606_1036... OK
+  Applying order.0181_merge_20240606_1325... OK
+  Applying order.0185_merge_20240607_1231... OK                                               Applying order.0183_merge_20240607_1222... OK
+  Applying order.0186_merge_20240607_1247... OK
+  Applying order.0184_orderevent_order_order_type_37fa0c_idx... OK
+  Applying order.0187_merge_20240624_1245... OK
+  Applying order.0188_order_undiscounted_base_shipping_price_amount... OK
+  Applying order.0189_set_undiscounted_base_shipping_price... OK
+  Applying order.0190_set_undiscounted_base_shipping_price... OK
+  Applying order.0174_order_checkout_token_btree_idx... OK
+  Applying order.0178_merge_20240726_1425... OK
+  Applying order.0179_merge_20240726_1438... OK
+  Applying order.0182_merge_20240726_1442... OK
+  Applying order.0185_merge_20240726_1445... OK
+  Applying order.0191_merge_20240726_1508... OK
+  Applying order.0192_set_undiscounted_base_shipping_price_on_draft_orders... OK
+  Applying payment.0054_merge_20231122_0828... OK
+  Applying payment.0055_merge_20231212_1610... OK
+  Applying payment.0056_merge_20231213_0755... OK                                             Applying order.0185_ordergrantedrefund_transaction_item... OK                               Applying order.0187_merge_20240617_1056... OK                                               Applying order.0188_merge_20240624_1308... OK                                               Applying order.0189_merge_20240708_0813... OK                                               Applying order.0190_merge_20240708_0814... OK                                               Applying order.0191_merge_20240725_0844... OK                                               Applying order.0192_merge_20240726_1513... OK                                               Applying order.0193_merge_20240805_0810... OK                                               Applying order.0194_alter_orderevent_type... OK                                             Applying order.0193_fix_subtotal_value_for_order_from_bulk... OK                            Applying order.0195_merge_20241014_0617... OK
+  Applying order.0196_alter_fulfillment_shipping_refund_amount_and_more... OK
+  Applying order.0197_fix_negative_total_net_for_orders_using_gift_cards... OK
+  Applying payment.0056_fix_invalid_atobarai_payments... OK
+  Applying payment.0057_transaction_token_idx... OK
+  Applying payment.0057_merge_20240514_0825... OK
+  Applying payment.0058_merge_20240802_1119... OK                                             Applying payment.0057_transactionevent_related_granted_refund... OK
+  Applying payment.0058_merge_20240514_1004... OK                                             Applying payment.0059_merge_20240802_1125... OK                                             Applying payment.0060_alter_payment_captured_amount_alter_payment_total_and_more... OK
+  Applying payment.0061_transaction_legacy_adyen_plugin_payment_method_and_more... OK         Applying permission.0002_alter_permission_content_type... OK                                Applying product.0195_alter_productchannellisting_discounted_price_amount_and_more... OK
+  Applying schedulers.0001_initial... OK        Applying shipping.0030_auto_20210415_1001... OK
+  Applying shipping.0031_alter_shippingmethodtranslation_language_code... OK                  Applying shipping.0032_shippingmethod_tax_class... OK                                       Applying shipping.0033_add_default_shipping... OK
+  Applying shipping.0034_shippingzone_countries_idx... OK                                     Applying shipping.0035_alter_shippingmethodchannellisting_maximum_order_price_amount_and_more... OK                                       Applying shipping.0036_alter_shippingzone_countries... OK                                   Applying site.0039_auto_20230615_1754... OK   Applying site.0040_sitesettings_allow_login_without_confirmation... OK                      Applying tax.0009_alter_taxclasscountryrate_rate... OK
+  Applying thumbnail.0002_alter_thumbnail_format... OK                                        Applying thumbnail.0003_auto_20230412_1943... OK                                            Applying warehouse.0032_alter_channel_warehouse... OK
+  Applying warehouse.0033_warehouse_external_reference... OK                                  Applying warehouse.0034_warehouse_click_and_collect_option_idx... OK                        Applying webhook.0009_webhook_custom_headers... OK
+  Applying webhook.0010_drop_transaction_request_action_event... OK                           Applying webhook.0011_webhook_filterable_channel_slugs... OK                                Applying webhook.0012_webhook_filterable_channel_slugs_idx... OK                          2025-12-02 11:29:31,221 WARNING kombu.connection No hostname was supplied. Reverting to default 'localhost' [PID:37:MainThread]
+2025-12-02 11:29:31,224 INFO saleor.core.search_tasks No users to update. [PID:37:MainThread]                                             2025-12-02 11:29:31,247 INFO celery.app.trace Task saleor.core.search_tasks.set_user_search_document_values[60495990-c5d3-45ac-9a05-f5dd5ddf8c3a] succeeded in 0.025400558000001183s: None [PID:37:MainThread]                        2025-12-02 11:29:31,250 INFO celery.app.trace Task saleor.order.migrations.tasks.saleor3_20.set_udniscounted_base_shipping_price_on_orders_task[7b7655a1-7f3b-4b8d-b92b-3df267516684] succeeded in 0.0018088430001625966s: None [PID:37:MainThread]                                 2025-12-02 11:29:31,252 INFO celery.app.trace Task saleor.order.migrations.tasks.saleor3_20.set_udniscounted_base_shipping_price_on_draft_orders_task[5588b141-b24e-42ea-b16e-969192b48415] succeeded in 0.0012108310002076905s: None [PID:37:MainThread]                           2025-12-02 11:29:31,255 INFO celery.app.trace Task saleor.order.migrations.tasks.saleor3_20.set_order_subtotal_for_orders_created_from_bulk[765036e2-d7e5-4ed3-a33e-fcfeaa6b034b] succeeded in 0.0024860240000634803s: None [PID:37:MainThread]                                     2025-12-02 11:29:31,278 INFO celery.app.trace Task saleor.discount.migrations.tasks.saleor3_17.update_discounted_prices_task[f17e6cbe-ac70-4a85-a95f-ee59dd961add] succeeded in 0.0052410280000003695s: None [PID:37:MainThread]
+2025-12-02 11:29:31,285 INFO celery.app.trace Task saleor.discount.migrations.tasks.saleor3_17.set_promotion_rule_variants[5858f1e6-03a9-4cd1-995f-d01ec677c3fa] succeeded in 0.005821158999879117s: None [PID:37:MainThread]         2025-12-02 11:29:31,286 INFO celery.app.trace Task saleor.discount.migrations.tasks.saleor3_20.set_discount_currency_task[b2e9159d-4173-4adb-a2bf-5ffa45a4b92d] succeeded in 0.0010337419998904807s: None [PID:37:MainThread]         2025-12-02 11:29:31,395 INFO celery.app.trace Task saleor.channel.migrations.tasks.saleor3_20.migrate_env_variable_setting_to_channels[aba55a25-2f2b-45a3-b5b0-98d003e77ffe] succeeded in 0.0013728520002587175s: None [PID:37:MainThread]                                          2025-12-02 11:29:31,395 INFO celery.app.trace Task saleor.channel.migrations.tasks.saleor3_20.migrate_env_variable_setting_to_channels[fcc2ce7a-da2b-434e-83ed-9b1a633855f1] succeeded in 0.023369705000277463s: None [PID:37:MainThread]                                           2025-12-02 11:29:31,424 INFO celery.app.trace Task saleor.checkout.migrations.tasks.saleor3_20.propagate_lines_undiscounted_unit_price_task[d60687a4-773d-4a9e-8897-9a2ab997e34e] succeeded in 0.001305952000166144s: None [PID:37:MainThread]
+2025-12-02 11:29:31,458 INFO saleor.core.search_tasks No orders to update. [PID:37:MainThread]                                            2025-12-02 11:29:31,458 INFO celery.app.trace Task saleor.core.search_tasks.set_order_search_document_values[1f6be29c-4a5b-4493-ba36-60765edf10cd] succeeded in 0.0025714140001582564s: None [PID:37:MainThread]                      2025-12-02 11:29:31,460 INFO saleor.core.search_tasks No orders to update. [PID:37:MainThread]
+2025-12-02 11:29:31,460 INFO celery.app.trace Task saleor.core.search_tasks.set_order_search_document_values[ab73ca8e-4886-4edb-a352-47b45befe52d] succeeded in 0.0016624330000922782s: None [PID:37:MainThread]
+2025-12-02 11:29:31,466 INFO celery.app.trace Task saleor.order.migrations.tasks.saleor3_20.fix_negative_total_net_for_orders_using_gift_cards_task[735ad57e-af7c-4de1-acc6-642dc29e09ab] succeeded in 0.002315763999831688s: None [PID:37:MainThread]
+root@WOPR:~#

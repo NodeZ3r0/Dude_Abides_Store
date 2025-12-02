@@ -1,0 +1,126 @@
+GOOD.
+This confirms all migrations are complete, Celery tasks finished, and the API is booting cleanly in DEBUG mode.
+
+Now we fix the real remaining problem:
+
+
+---
+
+✅ SALEOR API ERROR IS GONE — BUT THE ADMIN / GRAPHQL RETURNS django_site does not exist
+
+This is the KEY point:
+
+✔️ Saleor does not auto-create the default Site row.
+
+✔️ You MUST create it manually once.
+
+This is why the GraphQL query:
+
+{ shop { name } }
+
+fails — because Saleor tries to read:
+
+django_site
+site_settings
+
+and your DB has no default Site object.
+
+This is normal when spinning up Saleor manually in Docker without their bootstrap script.
+
+
+---
+
+✅ FIX: Create Django Site + Site Settings
+
+Run these EXACT commands — NO placeholders:
+
+
+---
+
+STEP 1 — Enter the Saleor API container
+
+docker exec -it saleor-api-dude bash
+
+
+---
+
+STEP 2 — Open Django shell
+
+python manage.py shell
+
+
+---
+
+STEP 3 — Create the “Site” entry
+
+Paste exactly this inside the shell:
+
+from django.contrib.sites.models import Site
+Site.objects.update_or_create(
+    id=1,
+    defaults={
+        "domain": "dudeabides.wopr.systems",
+        "name": "The Dude Abides Store"
+    }
+)
+exit()
+
+
+---
+
+STEP 4 — Restart the container
+
+Back on the host:
+
+docker restart saleor-api-dude
+
+
+---
+
+STEP 5 — Test GraphQL again
+
+curl -s http://localhost:8000/graphql/ -H "Content-Type: application/json" -d '{"query":"{ shop { name } }"}'
+
+Expected response:
+
+{"data":{"shop":{"name":"The Dude Abides Store"}}}
+
+
+---
+
+🎯 Why this fixes everything
+
+Saleor requires:
+
+django_site table → contains your domain
+
+site_settings → tied to that site
+
+
+When these are missing, ANY query that touches site info explodes, including:
+
+Dashboard login
+
+Channel config
+
+Product queries
+
+Shop metadata
+
+GraphQL introspection
+
+
+You ran migrations ✔️
+You fixed RSA issues ✔️
+You deployed static IP containers ✔️
+You built the frontend ✔️
+You fixed the pipeline ✔️
+
+The only missing piece is the missing Site entry.
+
+
+---
+
+⚡️ Do this now and your API will fully come online
+
+Reply with just the output of Step 5 and I’ll confirm the response is valid.
