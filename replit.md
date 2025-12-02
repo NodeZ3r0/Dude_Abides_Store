@@ -120,7 +120,8 @@ Preferred communication style: Simple, everyday language.
 ## VPS Production Environment (dudeabides.wopr.systems)
 
 **Infrastructure**
-- VPS hosted at dudeabides.wopr.systems
+- VPS IP: 157.180.78.176 (hostname: WOPR)
+- Domain: dudeabides.wopr.systems
 - Caddy reverse proxy handling SSL/TLS
 - Cloudflare CDN in front
 
@@ -142,18 +143,28 @@ All Saleor containers use static IP addresses on the `authentik_default` network
 - **PostgreSQL**: (container: saleor-postgres-dude, IP: 172.20.50.10)
 - **Redis**: (container: saleor-redis-dude, IP: 172.20.50.11)
 
-**Storefront (VPS)**
+**Storefront (VPS) - Runs as systemd service, NOT Docker**
 - Located at `/opt/thedudeabides-store/storefront/`
-- Port 3001 (maps to internal 3000)
-- Container: saleor-storefront
+- Port 3001
+- **Systemd service**: `dude-storefront.service`
+- **Environment file**: `/opt/thedudeabides-store/storefront/.env`
+- **Database**: Uses Saleor PostgreSQL (172.20.50.10:5432) for cart/session storage
 - **GitHub Repo**: `https://github.com/NodeZ3r0/Dude_Abides_Store.git`
 - **CRITICAL**: VPS must pull from NodeZ3r0/Dude_Abides_Store.git, NOT saleor/storefront.git
 
+**Storefront Service Commands**
+```bash
+systemctl status dude-storefront.service   # Check status
+systemctl restart dude-storefront.service  # Restart
+journalctl -u dude-storefront.service -f   # View logs
+```
+
 **Auto-Deploy Pipeline**
 - Timer: `dude-deploy.timer` runs every 5 minutes
+- Service: `dude-deploy.service`
 - Script: `/opt/thedudeabides-store/deploy.sh`
 - Email alerts on failure: stephen.falken@wopr.systems (rate-limited 1x per 24hr)
-- Workflow: Replit → GitHub push → VPS auto-pulls within 5 min
+- Workflow: Replit → GitHub push → VPS auto-pulls within 5 min → restarts storefront service
 
 **Printful Sync Service**
 - Located at `/opt/printful-sync/`
