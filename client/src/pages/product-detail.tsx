@@ -187,13 +187,23 @@ export default function ProductDetail() {
                 {product.variants && product.variants.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-sm font-bold text-[#e8dac9] uppercase tracking-wider">
-                      Select Variant
+                      Select Color
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => {
                         const isSelected = selectedVariant === variant.id;
                         const inCart = isInCart(variant.id);
-                        const attrLabel = variant.attributes?.map(a => a.values.map(v => v.name).join(', ')).join(' / ') || variant.name;
+                        
+                        // Extract the variant-specific part from the name
+                        // Format: "Product Name / Color" or "Product Name / Color1 / Color2"
+                        const nameParts = variant.name.split(' / ');
+                        const variantLabel = nameParts.length > 1 
+                          ? nameParts.slice(1).join(' / ')  // Everything after product name
+                          : variant.name;
+                        
+                        // Use SKU as fallback to extract color if name parsing fails
+                        const skuColor = variant.sku?.split('_')[1]?.replace(/-/g, ' ') || '';
+                        const displayLabel = variantLabel.includes('QXR0') ? skuColor : variantLabel;
                         
                         return (
                           <button
@@ -206,7 +216,7 @@ export default function ProductDetail() {
                             }`}
                             data-testid={`btn-variant-${variant.id}`}
                           >
-                            {attrLabel}
+                            {displayLabel}
                             {inCart && <Check className="inline-block ml-2 h-3 w-3" />}
                           </button>
                         );
