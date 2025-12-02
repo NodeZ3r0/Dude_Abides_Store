@@ -3,9 +3,9 @@ import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { useSaleorProduct, type SaleorProductDetail } from "@/lib/api";
 import { useCart } from "@/lib/cart-context";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Minus, Plus, ShoppingCart, Check } from "lucide-react";
+import { ChevronLeft, Minus, Plus, ShoppingCart, Check, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetail() {
@@ -13,6 +13,7 @@ export default function ProductDetail() {
   const { data: product, isLoading, error } = useSaleorProduct(slug || '');
   const { addToCart, isInCart } = useCart();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<number>(0);
@@ -39,6 +40,21 @@ export default function ProductDetail() {
       title: "Added to cart!",
       description: `${product.name} has been added to your cart.`,
     });
+  };
+
+  const handleBuyNow = () => {
+    if (!product || !selectedVariant) {
+      toast({
+        title: "Please select a variant",
+        description: "Choose a size or color before buying",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Add to cart and immediately navigate to checkout
+    addToCart(product, selectedVariant, quantity);
+    navigate("/checkout");
   };
 
   const currentVariant = product?.variants?.find(v => v.id === selectedVariant);
@@ -221,16 +237,30 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
-                <Button 
-                  onClick={handleAddToCart}
-                  size="lg"
-                  className="w-full bg-[#c45d36] hover:bg-[#a04d2e] text-white py-6 text-lg uppercase tracking-wider"
-                  disabled={!product.variants || product.variants.length === 0}
-                  data-testid="btn-add-to-cart"
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button 
+                    onClick={handleAddToCart}
+                    size="lg"
+                    variant="outline"
+                    className="flex-1 border-[#c45d36] text-[#c45d36] hover:bg-[#c45d36] hover:text-white py-6 text-lg uppercase tracking-wider"
+                    disabled={!product.variants || product.variants.length === 0}
+                    data-testid="btn-add-to-cart"
+                  >
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Add to Cart
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleBuyNow}
+                    size="lg"
+                    className="flex-1 bg-[#c45d36] hover:bg-[#a04d2e] text-white py-6 text-lg uppercase tracking-wider"
+                    disabled={!product.variants || product.variants.length === 0}
+                    data-testid="btn-buy-now"
+                  >
+                    <Zap className="mr-2 h-5 w-5" />
+                    Buy Now
+                  </Button>
+                </div>
 
                 {currentVariant?.sku && (
                   <p className="text-xs text-white/40">
