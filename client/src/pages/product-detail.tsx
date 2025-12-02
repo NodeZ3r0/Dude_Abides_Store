@@ -19,11 +19,17 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
 
+  // Set default variant when product loads
   useEffect(() => {
     if (product?.variants && product.variants.length > 0 && !selectedVariant) {
       setSelectedVariant(product.variants[0].id);
     }
   }, [product, selectedVariant]);
+
+  // Reset image selection when variant changes
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [selectedVariant]);
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
@@ -63,8 +69,15 @@ export default function ProductDetail() {
   const currency = currentVariant?.pricing?.price?.gross?.currency || 
                    product?.pricing?.priceRange?.start?.gross?.currency || 'USD';
 
-  const allMedia = product?.media || [];
-  const images = allMedia.length > 0 ? allMedia : (product?.thumbnail ? [{ id: 'thumb', url: product.thumbnail.url, alt: product.thumbnail.alt }] : []);
+  // Use variant-specific images if available, otherwise fall back to product media
+  const variantMedia = currentVariant?.media || [];
+  const productMedia = product?.media || [];
+  const thumbnailFallback = product?.thumbnail ? [{ id: 'thumb', url: product.thumbnail.url, alt: product.thumbnail.alt }] : [];
+  
+  // Priority: variant images > product images > thumbnail
+  const images = variantMedia.length > 0 
+    ? variantMedia 
+    : (productMedia.length > 0 ? productMedia : thumbnailFallback);
 
   const groupedAttributes = product?.variants?.reduce((acc, variant) => {
     variant.attributes?.forEach(attr => {
