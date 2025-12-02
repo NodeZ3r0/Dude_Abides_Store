@@ -1,0 +1,44 @@
+[2025-12-02 10:58:21 +0000] [22] [INFO] Started server process [22]
+[2025-12-02 10:58:21 +0000] [23] [INFO] Booting worker with pid: 23
+[2025-12-02 10:58:21 +0000] [24] [INFO] Booting worker with pid: 24
+[2025-12-02 10:58:21 +0000] [23] [INFO] Started server process [23]
+[2025-12-02 10:58:21 +0000] [24] [INFO] Started server process [24]
+root@WOPR:~# docker stop saleor-api-dude
+saleor-api-dude
+root@WOPR:~# docker start saleor-api-dude
+saleor-api-dude
+root@WOPR:~# sleep 5
+root@WOPR:~# docker logs saleor-api-dude --tail 5
+[2025-12-02 11:00:25 +0000] [24] [INFO] Started server process [24]
+[2025-12-02 11:00:25 +0000] [25] [INFO] Booting worker with pid: 25
+[2025-12-02 11:00:25 +0000] [25] [INFO] Started server process [25]
+[2025-12-02 11:00:25 +0000] [26] [INFO] Booting worker with pid: 26
+[2025-12-02 11:00:25 +0000] [26] [INFO] Started server process [26]
+root@WOPR:~# docker exec saleor-api-dude ping -c 2 saleor-postgres-dude
+OCI runtime exec failed: exec failed: unable to start container process: exec: "ping": executable file not found in $PATH
+root@WOPR:~# # Or check what IP it resolves toroot@WOPR:~# docker exec saleor-api-dude getent hosts saleor-postgres-dude
+172.20.0.6      saleor-postgres-dude
+root@WOPR:~# sudo systemctl restart docker
+# Wait for containers to come back up
+sleep 10
+# Start the containers again
+docker start saleor-postgres-dude saleor-redis-dude saleor-api-dude saleor-worker-dude
+# Verify DNS is now correct
+docker exec saleor-api-dude getent hosts saleor-postgres-dude
+root@WOPR:~# docker exec saleor-api-dude getent hosts saleor-postgres-dude
+Error response from daemon: container 2a9d95a1ef1d35a1673b0a58a26556a8908cef6cf40ed30e43edaa6e88a5c3b2 is not running
+root@WOPR:~# docker start saleor-postgres-dudesaleor-postgres-dude
+root@WOPR:~# sleep 5
+
+root@WOPR:~# docker start saleor-redis-dude
+saleor-redis-dude
+root@WOPR:~# docker start saleor-api-dude
+saleor-api-dude
+root@WOPR:~# docker start saleor-worker-dude
+saleor-worker-dude
+root@WOPR:~# sleep 5
+
+root@WOPR:~# docker exec saleor-api-dude getent hosts saleor-postgres-dude
+172.20.0.6      saleor-postgres-dude
+root@WOPR:~#
+root@WOPR:~#
