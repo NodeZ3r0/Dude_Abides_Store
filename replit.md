@@ -187,6 +187,15 @@ This Replit project serves as a **staging/development environment** for testing 
 
 ## Recent Changes (Dec 2, 2025)
 
+### Variant Image Switching Fixed (Dec 2, 2025)
+**Status**: Working - Product images now change when selecting different color variants
+
+**Fix Applied**:
+- Updated `/opt/printful-sync/app.py` to sync variant-specific mockup images from Printful
+- Each variant's `files` array contains a `type: "preview"` entry with `preview_url`
+- Images are uploaded to Saleor and assigned to variants via `variantMediaAssign` mutation
+- Frontend now shows variant-specific images when color is selected
+
 ### Successful Printful Product Sync with Variants
 **Status**: Working - Snapback Hat with 17 color variants now displaying at $33 each
 
