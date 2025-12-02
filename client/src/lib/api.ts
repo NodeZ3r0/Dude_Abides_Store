@@ -153,4 +153,68 @@ export function useSaleorCollections(channel?: string, first: number = 10) {
   });
 }
 
+export interface SaleorProductDetail extends SaleorProduct {
+  media?: Array<{
+    id: string;
+    url: string;
+    alt?: string;
+    type: string;
+  }>;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  variants?: Array<{
+    id: string;
+    name: string;
+    sku?: string;
+    quantityAvailable?: number;
+    pricing?: {
+      price?: {
+        gross: {
+          amount: number;
+          currency: string;
+        };
+      };
+    };
+    attributes?: Array<{
+      attribute: {
+        name: string;
+        slug: string;
+      };
+      values: Array<{
+        name: string;
+        slug: string;
+      }>;
+    }>;
+    media?: Array<{
+      id: string;
+      url: string;
+      alt?: string;
+    }>;
+  }>;
+  attributes?: Array<{
+    attribute: {
+      name: string;
+      slug: string;
+    };
+    values: Array<{
+      name: string;
+      slug: string;
+    }>;
+  }>;
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+export function useSaleorProduct(slug: string, channel?: string) {
+  const activeChannel = channel || getChannel();
+  return useQuery({
+    queryKey: ["saleor-product", slug, activeChannel],
+    queryFn: () => fetchAPI(`/saleor/product/${encodeURIComponent(slug)}?channel=${encodeURIComponent(activeChannel)}`) as Promise<SaleorProductDetail>,
+    enabled: !!slug,
+  });
+}
+
 export type { SaleorProduct, SaleorCategory, SaleorCollection };

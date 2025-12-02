@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Truck, Percent } from "lucide-react";
 import { useProducts, useSeedProducts, useSaleorProducts, useSaleorCategories, useSaleorCollections, type SaleorProduct, type SaleorCategory, type SaleorCollection } from "@/lib/api";
 import dudeRug from "@assets/3122730_main_1764430531420.jpg";
+import { Link } from "wouter";
 
 // Mock Data for Blogs
 const blogs = [
@@ -131,7 +132,7 @@ export default function Home() {
              <>
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {saleorProducts.slice(0, 8).map((product: SaleorProduct) => (
-                   <div key={product.id} className="group">
+                   <Link key={product.id} href={`/products/${product.slug}`} className="group" data-testid={`product-link-${product.slug}`}>
                       <div className="aspect-square bg-white/5 overflow-hidden rounded-sm mb-4 relative">
                          <div className="absolute top-2 left-2 z-10 flex items-center gap-1">
                             <div className="h-4 w-4 border border-white/30 rounded-sm"></div>
@@ -143,7 +144,7 @@ export default function Home() {
                            <div className="w-full h-full flex items-center justify-center text-white/30">No image</div>
                          )}
                          <div className="absolute bottom-0 left-0 w-full p-2 bg-background/80 backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity text-center">
-                            <Button size="sm" className="w-full bg-[#e8dac9] text-background hover:bg-white text-xs uppercase font-bold">Quick Shop</Button>
+                            <Button size="sm" className="w-full bg-[#e8dac9] text-background hover:bg-white text-xs uppercase font-bold">View Details</Button>
                          </div>
                       </div>
                       <div className="space-y-1">
@@ -154,14 +155,16 @@ export default function Home() {
                          <p className="text-xs text-[#c45d36]">The Dude Abides®</p>
                          <p className="text-xs text-green-500 uppercase tracking-wide">In stock</p>
                       </div>
-                   </div>
+                   </Link>
                 ))}
                </div>
                
                <div className="text-center mt-12">
-                  <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-6 text-sm font-bold uppercase tracking-widest rounded-sm">
-                     View All Products
-                  </Button>
+                  <Link href="/products">
+                    <Button className="bg-[#e8dac9] text-[#2a201c] hover:bg-white px-8 py-6 text-sm font-bold uppercase tracking-widest rounded-sm" data-testid="btn-view-all-products">
+                       View All Products
+                    </Button>
+                  </Link>
                </div>
              </>
            )}
@@ -288,8 +291,9 @@ export default function Home() {
           {saleorCategories && saleorCategories.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {saleorCategories.slice(0, 8).map((category: SaleorCategory) => (
-                <div 
-                  key={category.id} 
+                <Link 
+                  key={category.id}
+                  href={`/category/${category.slug}`}
                   className="group cursor-pointer" 
                   data-testid={`category-${category.slug}`}
                 >
@@ -316,7 +320,7 @@ export default function Home() {
                       {category.children.edges.length} subcategories
                     </p>
                   )}
-                </div>
+                </Link>
               ))}
             </div>
           ) : !categoriesLoading && (
@@ -363,7 +367,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                {saleorCollections && saleorCollections.length > 0 ? (
                  saleorCollections.slice(0, 4).map((collection: SaleorCollection) => (
-                   <div key={collection.id} className="group cursor-pointer text-center" data-testid={`collection-${collection.slug}`}>
+                   <Link key={collection.id} href={`/collection/${collection.slug}`} className="group cursor-pointer text-center" data-testid={`collection-${collection.slug}`}>
                      <div className="aspect-square bg-white overflow-hidden rounded-sm mb-4 flex items-center justify-center p-4">
                        {collection.backgroundImage?.url ? (
                          <img src={collection.backgroundImage.url} alt={collection.backgroundImage.alt || collection.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"/>
@@ -374,7 +378,7 @@ export default function Home() {
                        )}
                      </div>
                      <h3 className="font-display text-[#e8dac9] text-sm leading-tight group-hover:text-primary">{collection.name}</h3>
-                   </div>
+                   </Link>
                  ))
                ) : !collectionsLoading && (
                  [{
@@ -408,7 +412,7 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                {blogs.map((blog) => (
-                  <div key={blog.id} className="group cursor-pointer bg-[#2a201c] hover:bg-[#3a2c26] transition-colors rounded-sm overflow-hidden h-full flex flex-col">
+                  <Link key={blog.id} href={`/blog/${blog.id === 1 ? 'real-american-value-menu' : blog.id === 2 ? 'wired-for-democracy' : 'blitzgrift-chaos-governance'}`} className="group cursor-pointer bg-[#2a201c] hover:bg-[#3a2c26] transition-colors rounded-sm overflow-hidden h-full flex flex-col" data-testid={`blog-link-${blog.id}`}>
                      <div className="aspect-video overflow-hidden">
                         <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
                      </div>
@@ -418,11 +422,11 @@ export default function Home() {
                         <p className="text-sm text-white/60 mb-6 flex-1 line-clamp-3">{blog.excerpt}</p>
                         <span className="text-xs text-[#c45d36] font-bold uppercase tracking-widest group-hover:text-white transition-colors">Read now &gt;</span>
                      </div>
-                  </div>
+                  </Link>
                ))}
             </div>
             <div className="text-center mt-12">
-               <span className="text-xs text-[#c45d36] font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-colors">See more &gt;</span>
+               <Link href="/blog" className="text-xs text-[#c45d36] font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-colors" data-testid="link-see-more-blog">See more &gt;</Link>
             </div>
          </div>
       </section>

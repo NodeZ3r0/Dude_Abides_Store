@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import logoImage from "@assets/logo-400_1764430531407.png";
+import { useCart } from "@/lib/cart-context";
 
 export function Header() {
+  const { getItemCount } = useCart();
+  const itemCount = getItemCount();
+
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-white/10">
       <div className="w-full px-3 md:container md:mx-auto md:px-4 h-20 md:h-24 flex items-center">
@@ -14,16 +18,17 @@ export function Header() {
         <div className="flex flex-1 basis-0 items-center gap-0 md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9">
+              <Button variant="ghost" size="icon" className="text-foreground hover:text-primary h-9 w-9" data-testid="btn-mobile-menu">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="bg-background border-r-white/10 text-foreground bg-pattern-overlay">
               <nav className="relative z-10 flex flex-col gap-6 mt-10">
                 <Link href="/" className="text-2xl font-display hover:text-primary transition-colors">Home</Link>
-                <Link href="/catalog" className="text-2xl font-display hover:text-primary transition-colors">All Categories</Link>
+                <Link href="/products" className="text-2xl font-display hover:text-primary transition-colors">Shop All</Link>
                 <Link href="/about" className="text-2xl font-display hover:text-primary transition-colors">About The Dude</Link>
                 <Link href="/blog" className="text-2xl font-display hover:text-primary transition-colors">Blog</Link>
+                <Link href="/cart" className="text-2xl font-display hover:text-primary transition-colors">Cart ({itemCount})</Link>
               </nav>
             </SheetContent>
           </Sheet>
@@ -56,10 +61,10 @@ export function Header() {
 
         {/* Desktop Nav Links */}
         <nav className="hidden lg:flex items-center gap-6 mr-6">
-          <Link href="/" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80">Home</Link>
-          <Link href="/catalog" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80">Catalog</Link>
-          <Link href="/contact" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80">Contact</Link>
-          <Link href="/shop" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80">Shop</Link>
+          <Link href="/" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80" data-testid="link-home">Home</Link>
+          <Link href="/products" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80" data-testid="link-products">Shop</Link>
+          <Link href="/blog" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80" data-testid="link-blog">Blog</Link>
+          <Link href="/about" className="text-sm font-bold hover:text-primary transition-colors uppercase tracking-wider text-foreground/80" data-testid="link-about">About</Link>
         </nav>
 
         {/* Actions - equal width column on mobile, right-aligned */}
@@ -69,12 +74,16 @@ export function Header() {
              <span>Login</span>
           </div>
           
-          <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary transition-colors">
-            <ShoppingBag className="h-6 w-6" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold flex items-center justify-center text-white">
-              0
-            </span>
-          </Button>
+          <Link href="/cart">
+            <Button variant="ghost" size="icon" className="relative text-foreground hover:text-primary transition-colors" data-testid="btn-cart">
+              <ShoppingBag className="h-6 w-6" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[#c45d36] text-[10px] font-bold flex items-center justify-center text-white" data-testid="cart-count">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
