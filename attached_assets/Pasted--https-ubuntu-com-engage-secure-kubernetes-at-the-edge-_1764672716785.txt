@@ -1,0 +1,85 @@
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+17 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+36 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+You have mail.
+Last login: Tue Dec  2 04:26:10 2025 from 66.226.109.8
+root@WOPR:~#
+
+layout.tsx
+
+
+index.css
+
+
+App.tsx
+
+
+api.ts
+
+
+Secrets
+
+Docs
+
+New Secret
+
+SESSION_SECRET
+
+••••••••
+
+
+
+DATABASE_URL
+
+••••••••
+
+
+
+PGDATABASE
+root@WOPR:~#
+••••••••
+layout.tsx
+
+
+index.css
+
+••••••••
+App.tsx
+
+
+api.ts
+
+••••••••
+Secrets
+
+Docs
+
+docker restart saleor-worker-dude^Cr VPS:ation
+root@WOPR:~# # Check container status
+root@WOPR:~# docker ps -a | grep saleor
+f93545ac4148   storefront-saleor-storefront              "docker-entrypoint.s…"   22 hours ago   Restarting (1) 59 seconds ago                                                    saleo-storefront
+d4598afe3c85   ghcr.io/saleor/saleor-dashboard:3.20      "/docker-entrypoint.…"   34 hours ago   Exited (0) 21 minutes ago                                                        saleo-dashboard-dude
+2a9d95a1ef1d   ghcr.io/saleor/saleor:3.20                "gunicorn --bind :80…"   35 hours ago   Exited (0) 21 minutes ago                                                        saleo-api-dude
+86d67023c9d9   postgres:15-alpine                        "docker-entrypoint.s…"   4 days ago     Up 16 minutes                   5432/tcp                                         saleo-postgres-dude
+aea4ab647056   redis:7-alpine                            "docker-entrypoint.s…"   4 days ago     Up 16 minutes                   6379/tcp                                         saleo-redis-dude
+fbe88397ef0c   ghcr.io/saleor/saleor:3.20                "celery --app saleor…"   5 days ago     Up 16 minutes                   8000/tcp                                         saleo-worker-dude
+root@WOPR:~#
+root@WOPR:~# # Restart the Saleor API container
+root@WOPR:~# docker restart saleor-api-dude
+saleor-api-dude
+root@WOPR:~#
+root@WOPR:~# # Or if it's stopped, start it
+root@WOPR:~# docker start saleor-api-dude
+saleor-api-dude
+root@WOPR:~#
+root@WOPR:~# # Also restart the worker if needed
+root@WOPR:~# docker restart saleor-worker-dudesaleor-worker-dude
+root@WOPR:~#
