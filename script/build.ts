@@ -61,7 +61,7 @@ async function buildAll() {
       "process.env.NODE_ENV": '"production"',
     },
     minify: true,
-        external: [...externals, "./vite", "./vite.js", "./vite.ts"],
+    external: [...externals, "./vite", "./vite.js", "./vite.ts"],
     logLevel: "info",
   });
 }
